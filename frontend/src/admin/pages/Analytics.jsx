@@ -42,7 +42,7 @@ const Analytics = () => {
                 return;
             }
 
-            const res = await axios.get(`http://localhost:5000/api/orders/stats?range=${timeRange}`, {
+            const res = await axios.get(`/api/orders/stats?range=${timeRange}`, {
                 headers: { token }
             });
 

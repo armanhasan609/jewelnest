@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 export const ShopContext = createContext();
 
 const ShopContextProvider = ({ children }) => {
-    const backendUrl = "http://localhost:5000";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const currency = "₹";
     const delivery_fee = 50;
     const FREE_SHIPPING_THRESHOLD = 499;

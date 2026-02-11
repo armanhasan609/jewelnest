@@ -6,12 +6,13 @@ const Dashboard = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL ;
 
     const fetchProducts = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await axios.get('http://localhost:5000/api/products/all');
+            const res = await axios.get(`${backendUrl}/api/products/all`);
             // Handle both response formats
             const productsData = res.data.success ? res.data.products : res.data;
             setProducts(Array.isArray(productsData) ? productsData : []);

@@ -37,7 +37,7 @@ const EditProduct = () => {
         const fetchSubCategories = async () => {
             try {
                 // Using axios directly or API instance depending on preference, sticking to existing style mostly
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+                const backendUrl = import.meta.env.VITE_BACKEND_URL;
                 const response = await axios.get(`${backendUrl}/api/subcategories/all`);
                 if (response.data.success) {
                     const dbSubCategories = response.data.subCategories.map(sc => sc.name);
@@ -134,7 +134,7 @@ const EditProduct = () => {
         const fetchProductData = async () => {
             try {
                 setFetchLoading(true);
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+                const backendUrl = import.meta.env.VITE_BACKEND_URL;
                 const response = await axios.post(`${backendUrl}/api/products/single`, { productId: id });
 
                 if (response.data.success) {
@@ -239,7 +239,7 @@ const EditProduct = () => {
         }
 
         try {
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+            const backendUrl = import.meta.env.VITE_BACKEND_URL;
             const response = await axios.post(`${backendUrl}/api/subcategories/add`, { name: trimmedName });
             if (response.data.success) {
                 setSubCategoryOptions([...subCategoryOptions, trimmedName]);
@@ -261,7 +261,7 @@ const EditProduct = () => {
 
         if (window.confirm(`Are you sure you want to delete "${categoryToDelete}"?`)) {
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+                const backendUrl = import.meta.env.VITE_BACKEND_URL;
                 const response = await axios.post(`${backendUrl}/api/subcategories/delete`, { name: categoryToDelete });
                 if (response.data.success) {
                     toast.success("Sub Category deleted!");
@@ -368,7 +368,7 @@ const EditProduct = () => {
             console.log('Existing images count:', existingImages.length);
             console.log('New images count:', images.length);
 
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+            const backendUrl = import.meta.env.VITE_BACKEND_URL;
             const response = await axios.post(`${backendUrl}/api/products/update`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'

@@ -18,7 +18,7 @@ const Users = () => {
     const [userToDelete, setUserToDelete] = useState(null);
     const [stats, setStats] = useState({ total: 0, admins: 0, active: 0, restricted: 0 });
 
-    const backendUrl = "http://localhost:5000";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const token = localStorage.getItem('token');
     const amISuperAdmin = localStorage.getItem('isSuperAdmin') === 'true';
     const loggedInUserId = localStorage.getItem('userId');

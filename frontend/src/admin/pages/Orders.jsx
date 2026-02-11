@@ -26,7 +26,7 @@ const Orders = () => {
     const [currentOrderDetails, setCurrentOrderDetails] = useState(null);
     const [deliveryQrOrder, setDeliveryQrOrder] = useState(null);
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(() => {
         fetchOrders();

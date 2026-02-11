@@ -36,7 +36,7 @@ if (missingRazorpayEnv.length) {
 const app = express();
 
 // 3. Middlewares (Order is very important here)
-const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'].filter(Boolean);
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://72.62.228.234', 'http://localhost:5174'].filter(Boolean);
 
 app.use(cors({
     origin: (origin, callback) => {

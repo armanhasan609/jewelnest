@@ -146,21 +146,17 @@ const Product = () => {
                     width: '100%',
                     margin: '0 auto'
                 }}>
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '60px'
-                    }}>
+                    <div className="product-main-grid">
                         {/* Image Skeleton */}
                         <div>
-                            <div style={{
-                                background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
-                                backgroundSize: '200% 100%',
-                                animation: 'loading 1.5s infinite',
-                                borderRadius: '24px',
-                                height: '500px',
-                                marginBottom: '20px'
-                            }}></div>
+                            <div
+                                className="product-skeleton-img"
+                                style={{
+                                    background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+                                    backgroundSize: '200% 100%',
+                                    animation: 'loading 1.5s infinite',
+                                }}
+                            ></div>
                         </div>
 
                         {/* Info Skeleton */}
@@ -308,12 +304,12 @@ const Product = () => {
                 </div>
 
                 {/* Product Main Content */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '60px',
-                    marginBottom: '80px'
-                }}>
+                <div
+                    className="product-main-grid"
+                    style={{
+                        marginBottom: '80px'
+                    }}
+                >
                     {/* Product Images */}
                     <div>
                         {/* Main Image */}
@@ -327,9 +323,8 @@ const Product = () => {
                             <img
                                 src={productImages[selectedImage] || productImages[0]}
                                 alt={productData.name}
+                                className="product-main-img"
                                 style={{
-                                    width: '100%',
-                                    height: '500px',
                                     objectFit: 'cover',
                                     transition: 'transform 0.3s ease'
                                 }}
@@ -719,7 +714,7 @@ const Product = () => {
                             }}>
                                 Product Features
                             </h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="features-grid">
                                 {[
                                     { icon: Gem, label: 'Premium Quality', desc: '100% Authentic Materials' },
                                     { icon: Shield, label: 'Secure Payment', desc: 'SSL Encrypted Checkout' },
@@ -780,7 +775,7 @@ const Product = () => {
                             }}>
                                 Product Details
                             </h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                            <div className="details-grid">
                                 <div>
                                     <p style={{
                                         fontSize: '12px',
@@ -943,6 +938,69 @@ const Product = () => {
 
             {/* CSS Animations */}
             <style>{`
+                /* Main Grid Layout */
+                .product-main-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 60px;
+                }
+
+                /* Features Grid */
+                .features-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 16px;
+                }
+
+                /* Details Grid */
+                .details-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 20px;
+                }
+
+                /* Image Styles */
+                .product-main-img {
+                    width: 100%;
+                    height: 500px;
+                }
+
+                .product-skeleton-img {
+                    border-radius: 24px;
+                    height: 500px;
+                    margin-bottom: 20px;
+                }
+
+                /* Responsive Styles */
+                @media (max-width: 1024px) {
+                    .product-main-grid {
+                        gap: 40px;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .product-main-grid {
+                        grid-template-columns: 1fr;
+                        gap: 40px;
+                    }
+
+                    .features-grid {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .details-grid {
+                        grid-template-columns: 1fr;
+                    }
+
+                    .product-main-img {
+                        height: 350px;
+                    }
+
+                    .product-skeleton-img {
+                        height: 350px;
+                    }
+                }
+
                 @keyframes slideIn {
                     from {
                         transform: translateY(-10px);
@@ -957,12 +1015,6 @@ const Product = () => {
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
-                }
-                
-                @media (max-width: 1024px) {
-                    .product-grid {
-                        grid-template-columns: 1fr;
-                    }
                 }
             `}</style>
         </div>
