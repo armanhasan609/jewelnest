@@ -11,7 +11,7 @@ const Inquiries = ({ token }) => {
     const [deleting, setDeleting] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [inquiryToDelete, setInquiryToDelete] = useState(null);
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const fetchMessages = async () => {
         setLoading(true);

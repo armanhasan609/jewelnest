@@ -6,7 +6,7 @@ const Dashboard = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const backendUrl = import.meta.env.VITE_BACKEND_URL ;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -28,7 +28,6 @@ const Dashboard = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this jewelry item?")) {
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
                 await axios.post(`${backendUrl}/api/products/remove`, { id });
                 fetchProducts();
             } catch (err) {
