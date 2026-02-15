@@ -97,7 +97,6 @@ const Dashboard = () => {
 
     const statsGridStyle = {
         display: 'grid',
-        gridTemplateColumns: 'repeat(1, 1fr)',
         gap: 'clamp(16px, 2vw, 20px)',
         marginBottom: 'clamp(24px, 3vw, 32px)',
         width: '100%'
@@ -203,7 +202,7 @@ const Dashboard = () => {
     return (
         <div style={containerStyle}>
             {/* Header */}
-            <div style={headerStyle}>
+            <div style={headerStyle} className="header-container">
                 <div style={headerInnerStyle}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <h1 style={titleStyle}>Jewelry Inventory</h1>
@@ -217,7 +216,7 @@ const Dashboard = () => {
                             Manage your jewelry collection, track inventory, and update product details
                         </p>
                     </div>
-                    <div style={badgeStyle}>
+                    <div style={badgeStyle} className="badge-container">
                         <svg
                             width="clamp(14px, 1vw, 16px)"
                             height="clamp(14px, 1vw, 16px)"
@@ -234,7 +233,7 @@ const Dashboard = () => {
             </div>
 
             {/* Stats Cards */}
-            <div style={statsGridStyle}>
+            <div style={statsGridStyle} className="stats-grid">
                 {[
                     { title: 'Total Products', value: products.length, icon: '📦', color: '#3b82f6' },
                     { title: 'Gold Items', value: products.filter(p => p.category === 'Gold').length, icon: '💰', color: '#f59e0b' },

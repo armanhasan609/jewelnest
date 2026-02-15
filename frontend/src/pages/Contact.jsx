@@ -155,8 +155,8 @@ const Contact = () => {
                                             color: '#6b7280',
                                             lineHeight: '1.5'
                                         }}>
-                                            H NO 6E, Khanpatti, Vaishali<br />
-                                            Bihar, India - 844122
+                                            JewelNest, Banipur, Murshidabad<br />
+                                            West Bengal, India - 742235
                                         </p>
                                     </div>
                                 </div>
@@ -204,7 +204,7 @@ const Contact = () => {
                                             fontSize: '14px',
                                             color: '#6b7280'
                                         }}>
-                                            +91 9599548458
+                                            +91 86090 30343
                                         </p>
                                     </div>
                                 </div>
@@ -252,7 +252,7 @@ const Contact = () => {
                                             fontSize: '14px',
                                             color: '#6b7280'
                                         }}>
-                                            support@jewelnest.com
+                                            jewelnest86@gmail.com
                                         </p>
                                     </div>
                                 </div>
@@ -406,53 +406,7 @@ const Contact = () => {
                     </div>
                 </div>
 
-                {/* Map/CTA Section */}
-                <div style={{
-                    marginTop: '80px',
-                    textAlign: 'center',
-                    padding: '40px',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #fef3c7 100%)',
-                    borderRadius: '24px',
-                    border: '1px solid rgba(255, 255, 255, 0.2)'
-                }}>
-                    <h3 style={{
-                        fontSize: '24px',
-                        fontWeight: '700',
-                        color: '#1a202c',
-                        marginBottom: '16px'
-                    }}>
-                        Visit Our Store
-                    </h3>
-                    <p style={{
-                        fontSize: '16px',
-                        color: '#6b7280',
-                        marginBottom: '32px',
-                        maxWidth: '600px',
-                        marginLeft: 'auto',
-                        marginRight: 'auto'
-                    }}>
-                        Experience our jewelry collection in person. Our experts are available to assist you with personalized recommendations.
-                    </p>
-                    <div style={{
-                        height: '200px',
-                        background: 'linear-gradient(135deg, #e5e7eb, #d1d5db)',
-                        borderRadius: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#6b7280',
-                        fontSize: '14px',
-                        marginBottom: '32px'
-                    }}>
-                        <div style={{
-                            textAlign: 'center'
-                        }}>
-                            <MapPin size={40} style={{ color: '#9ca3af', marginBottom: '12px' }} />
-                            <p>Interactive Map Coming Soon</p>
-                            <p style={{ fontSize: '12px', marginTop: '4px' }}>📍 Khanpatti, Vaishali, Bihar</p>
-                        </div>
-                    </div>
-                </div>
+
             </div>
 
             {/* Embedded animations */}

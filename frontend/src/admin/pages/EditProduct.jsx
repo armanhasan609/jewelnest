@@ -770,7 +770,7 @@ const EditProduct = () => {
                                                     objectFit: 'cover'
                                                 }}
                                                 onError={(e) => {
-                                                    e.target.src = 'https://via.placeholder.com/300x300?text=Image+Error';
+                                                    e.target.src = 'https://placehold.co/300x300?text=Image+Error';
                                                 }}
                                             />
                                             <button

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { Trash2, Phone, Mail, Eye, X, User, MessageSquare, Calendar, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Trash2, Phone, Mail, Eye, X, User, MessageSquare, Calendar, AlertCircle, CheckCircle, Clock, ArrowLeft } from 'lucide-react';
 
 const Inquiries = ({ token }) => {
     const [messages, setMessages] = useState([]);
@@ -11,7 +11,14 @@ const Inquiries = ({ token }) => {
     const [deleting, setDeleting] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [inquiryToDelete, setInquiryToDelete] = useState(null);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const fetchMessages = async () => {
         setLoading(true);
@@ -164,31 +171,6 @@ const Inquiries = ({ token }) => {
         });
     };
 
-    const containerStyle = {
-        padding: '32px',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-        minHeight: '100vh',
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-    };
-
-    const headerStyle = {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '32px',
-        flexWrap: 'wrap',
-        gap: '24px'
-    };
-
-    const titleStyle = {
-        fontSize: '32px',
-        fontWeight: '800',
-        background: 'linear-gradient(135deg, #1e293b 0%, #475569 100%)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        letterSpacing: '-0.025em'
-    };
-
     const filterButtonStyle = (active) => ({
         padding: '8px 16px',
         borderRadius: '20px',
@@ -289,8 +271,97 @@ const Inquiries = ({ token }) => {
         : [];
 
     return (
-        <div style={containerStyle}>
+        <div className="page-container">
             <style>{`
+                .page-container {
+                    padding: 32px;
+                    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                    min-height: 100vh;
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                }
+
+                .header-container {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 32px;
+                    flex-wrap: wrap;
+                    gap: 24px;
+                }
+
+                .title-text {
+                    font-size: 32px;
+                    font-weight: 800;
+                    background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    letter-spacing: -0.025em;
+                }
+
+                .stats-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 20px;
+                    margin-bottom: 32px;
+                }
+
+                .content-container {
+                     display: flex;
+                     gap: 32px;
+                     height: calc(100vh - 280px);
+                }
+
+                .inquiries-list {
+                    flex: 2;
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+                    overflow: hidden;
+                    transition: flex 0.3s ease;
+                }
+
+                .details-panel {
+                    flex: 1;
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+                    padding: 32px;
+                    display: flex;
+                    flex-direction: column;
+                    animation: slideIn 0.3s ease-out;
+                    overflow-y: auto;
+                }
+
+                @media (max-width: 1024px) {
+                    .page-container {
+                        padding: 16px;
+                    }
+                    
+                    .header-container {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 16px;
+                        margin-bottom: 24px;
+                    }
+
+                    .title-text {
+                        font-size: 24px;
+                    }
+
+                    .stats-grid {
+                         grid-template-columns: 1fr;
+                         gap: 12px;
+                    }
+                    
+                    .content-container {
+                        height: calc(100vh - 200px); /* Adjust height for mobile */
+                    }
+                }
+
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
@@ -440,9 +511,9 @@ const Inquiries = ({ token }) => {
                 </div>
             )}
 
-            <div style={headerStyle}>
-                <div>
-                    <h1 style={titleStyle}>Customer Inquiries</h1>
+            <div className="header-container">
+                <div style={{ width: isMobile ? '100%' : 'auto' }}>
+                    <h1 className="title-text">Customer Inquiries</h1>
                     <p style={{
                         fontSize: '15px',
                         color: '#64748b',
@@ -460,7 +531,10 @@ const Inquiries = ({ token }) => {
                     padding: '6px',
                     borderRadius: '24px',
                     border: '1px solid #e2e8f0',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                    width: isMobile ? '100%' : 'auto',
+                    justifyContent: isMobile ? 'center' : 'flex-start',
+                    flexWrap: 'wrap'
                 }}>
                     {['all', 'unread', 'read'].map((filter) => (
                         <button
@@ -487,287 +561,274 @@ const Inquiries = ({ token }) => {
             </div>
 
             {/* Stats Overview */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '20px',
-                marginBottom: '32px'
-            }}>
-                {[
-                    { label: 'Total Inquiries', value: messages.length, color: '#3b82f6', icon: <MessageSquare size={20} /> },
-                    { label: 'Unread', value: messages.filter(m => m.status === 'unread').length, color: '#f59e0b', icon: <AlertCircle size={20} /> },
-                    { label: 'Resolved', value: messages.filter(m => m.status === 'read').length, color: '#10b981', icon: <CheckCircle size={20} /> }
-                ].map((stat, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
-                            backdropFilter: 'blur(10px)',
-                            padding: '24px',
-                            borderRadius: '16px',
-                            border: '1px solid rgba(255, 255, 255, 0.3)',
-                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
-                            transition: 'all 0.3s ease',
-                            borderLeft: `4px solid ${stat.color}`
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-4px)';
-                            e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.1)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.06)';
-                        }}
-                    >
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginBottom: '16px'
-                        }}>
-                            <div>
-                                <p style={{
-                                    fontSize: '14px',
-                                    color: '#64748b',
-                                    fontWeight: '500',
-                                    marginBottom: '4px'
-                                }}>
-                                    {stat.label}
-                                </p>
-                                <h2 style={{
-                                    fontSize: '32px',
-                                    fontWeight: '700',
-                                    color: '#1e293b'
-                                }}>
-                                    {stat.value}
-                                </h2>
-                            </div>
+            {(!isMobile || !selectedInquiry) && (
+                <div className="stats-grid">
+                    {[
+                        { label: 'Total Inquiries', value: messages.length, color: '#3b82f6', icon: <MessageSquare size={20} /> },
+                        { label: 'Unread', value: messages.filter(m => m.status === 'unread').length, color: '#f59e0b', icon: <AlertCircle size={20} /> },
+                        { label: 'Resolved', value: messages.filter(m => m.status === 'read').length, color: '#10b981', icon: <CheckCircle size={20} /> }
+                    ].map((stat, index) => (
+                        <div
+                            key={index}
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+                                backdropFilter: 'blur(10px)',
+                                padding: '24px',
+                                borderRadius: '16px',
+                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
+                                transition: 'all 0.3s ease',
+                                borderLeft: `4px solid ${stat.color}`
+                            }}
+                        >
                             <div style={{
-                                padding: '12px',
-                                borderRadius: '12px',
-                                backgroundColor: `${stat.color}15`,
-                                color: stat.color
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginBottom: '16px'
                             }}>
-                                {stat.icon}
+                                <div>
+                                    <p style={{
+                                        fontSize: '14px',
+                                        color: '#64748b',
+                                        fontWeight: '500',
+                                        marginBottom: '4px'
+                                    }}>
+                                        {stat.label}
+                                    </p>
+                                    <h2 style={{
+                                        fontSize: '32px',
+                                        fontWeight: '700',
+                                        color: '#1e293b'
+                                    }}>
+                                        {stat.value}
+                                    </h2>
+                                </div>
+                                <div style={{
+                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: `${stat.color}15`,
+                                    color: stat.color
+                                }}>
+                                    {stat.icon}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
 
             {loading ? (
                 <LoadingScreen />
             ) : messages.length === 0 ? (
                 <EmptyState />
             ) : (
-                <div style={{
-                    display: 'flex',
-                    gap: '32px',
-                    height: 'calc(100vh - 280px)'
-                }}>
+                <div className="content-container">
                     {/* Inquiries List */}
-                    <div style={{
-                        flex: selectedInquiry ? 1 : 2,
-                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
-                        backdropFilter: 'blur(10px)',
-                        borderRadius: '20px',
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
-                        overflow: 'hidden',
-                        transition: 'flex 0.3s ease'
-                    }}>
-                        <div style={{
-                            padding: '24px',
-                            borderBottom: '2px solid #f1f5f9'
-                        }}>
-                            <h3 style={{
-                                fontSize: '18px',
-                                fontWeight: '600',
-                                color: '#1e293b',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px'
+                    {(!isMobile || !selectedInquiry) && (
+                        <div className="inquiries-list">
+                            <div style={{
+                                padding: '24px',
+                                borderBottom: '2px solid #f1f5f9'
                             }}>
-                                <MessageSquare size={20} /> Recent Inquiries
-                            </h3>
-                        </div>
-                        <div style={{
-                            overflowY: 'auto',
-                            height: 'calc(100% - 80px)'
-                        }}>
-                            {filteredMessages.map((item, index) => (
-                                <div
-                                    key={index}
-                                    style={{
-                                        padding: '20px',
-                                        borderBottom: '1px solid #f1f5f9',
-                                        transition: 'all 0.3s ease',
-                                        background: selectedInquiry?._id === item._id ? 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' : 'transparent',
-                                        borderLeft: selectedInquiry?._id === item._id ? '4px solid #3b82f6' : '4px solid transparent'
-                                    }}
-                                >
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'flex-start',
-                                        marginBottom: '12px'
-                                    }}>
-                                        <div onClick={() => setSelectedInquiry(item)} style={{ cursor: 'pointer', flex: 1 }}>
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '12px',
-                                                marginBottom: '8px'
-                                            }}>
-                                                <div style={{
-                                                    width: '40px',
-                                                    height: '40px',
-                                                    borderRadius: '12px',
-                                                    background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: 'white',
-                                                    fontWeight: '600',
-                                                    fontSize: '16px'
-                                                }}>
-                                                    {item.name.charAt(0).toUpperCase()}
-                                                </div>
-                                                <div>
-                                                    <h4 style={{
-                                                        fontSize: '16px',
-                                                        fontWeight: '600',
-                                                        color: '#1e293b',
-                                                        marginBottom: '4px'
-                                                    }}>
-                                                        {item.name}
-                                                    </h4>
-                                                    <div style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '8px',
-                                                        fontSize: '13px',
-                                                        color: '#64748b'
-                                                    }}>
-                                                        <Mail size={12} /> {item.email}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px'
-                                        }}>
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '8px',
-                                                fontSize: '11px',
-                                                color: getStatusColor(item.status),
-                                                fontWeight: '600',
-                                                padding: '6px 12px',
-                                                backgroundColor: `${getStatusColor(item.status)}15`,
-                                                borderRadius: '20px'
-                                            }}>
-                                                {getStatusIcon(item.status)}
-                                                {item.status || 'pending'}
-                                            </div>
-                                            <button
-                                                onClick={() => confirmDelete(item)}
-                                                style={{
-                                                    padding: '8px',
-                                                    borderRadius: '8px',
-                                                    border: '1px solid #fee2e2',
-                                                    background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-                                                    color: '#dc2626',
-                                                    cursor: 'pointer',
-                                                    transition: 'all 0.3s ease',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.transform = 'scale(1.1)';
-                                                    e.currentTarget.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.transform = 'scale(1)';
-                                                    e.currentTarget.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
-                                                }}
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div onClick={() => setSelectedInquiry(item)} style={{ cursor: 'pointer' }}>
-                                        <div style={{
-                                            fontSize: '14px',
-                                            color: '#475569',
-                                            marginBottom: '12px',
-                                            fontWeight: '500'
-                                        }}>
-                                            {item.subject}
-                                        </div>
-
-                                        <div style={{
-                                            fontSize: '13px',
-                                            color: '#64748b',
-                                            lineHeight: '1.5',
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                            marginBottom: '16px'
-                                        }}>
-                                            {item.message}
-                                        </div>
-
+                                <h3 style={{
+                                    fontSize: '18px',
+                                    fontWeight: '600',
+                                    color: '#1e293b',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <MessageSquare size={20} /> Recent Inquiries
+                                </h3>
+                            </div>
+                            <div style={{
+                                overflowY: 'auto',
+                                height: 'calc(100% - 80px)'
+                            }}>
+                                {filteredMessages.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            padding: '20px',
+                                            borderBottom: '1px solid #f1f5f9',
+                                            transition: 'all 0.3s ease',
+                                            background: selectedInquiry?._id === item._id ? 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' : 'transparent',
+                                            borderLeft: selectedInquiry?._id === item._id ? '4px solid #3b82f6' : '4px solid transparent'
+                                        }}
+                                    >
                                         <div style={{
                                             display: 'flex',
                                             justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            fontSize: '12px',
-                                            color: '#94a3b8'
+                                            alignItems: 'flex-start',
+                                            marginBottom: '12px'
                                         }}>
+                                            <div onClick={() => setSelectedInquiry(item)} style={{ cursor: 'pointer', flex: 1 }}>
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '12px',
+                                                    marginBottom: '8px'
+                                                }}>
+                                                    <div style={{
+                                                        width: '40px',
+                                                        height: '40px',
+                                                        borderRadius: '12px',
+                                                        background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: 'white',
+                                                        fontWeight: '600',
+                                                        fontSize: '16px'
+                                                    }}>
+                                                        {item.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <h4 style={{
+                                                            fontSize: '16px',
+                                                            fontWeight: '600',
+                                                            color: '#1e293b',
+                                                            marginBottom: '4px'
+                                                        }}>
+                                                            {item.name}
+                                                        </h4>
+                                                        <div style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '8px',
+                                                            fontSize: '13px',
+                                                            color: '#64748b'
+                                                        }}>
+                                                            <Mail size={12} /> {item.email}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: '8px'
                                             }}>
-                                                <Phone size={12} />
-                                                {item.userId?.phoneNumber || 'No phone provided'}
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px',
+                                                    fontSize: '11px',
+                                                    color: getStatusColor(item.status),
+                                                    fontWeight: '600',
+                                                    padding: '6px 12px',
+                                                    backgroundColor: `${getStatusColor(item.status)}15`,
+                                                    borderRadius: '20px'
+                                                }}>
+                                                    {getStatusIcon(item.status)}
+                                                    {item.status || 'pending'}
+                                                </div>
+                                                <button
+                                                    onClick={() => confirmDelete(item)}
+                                                    style={{
+                                                        padding: '8px',
+                                                        borderRadius: '8px',
+                                                        border: '1px solid #fee2e2',
+                                                        background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                                                        color: '#dc2626',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.3s ease',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.transform = 'scale(1.1)';
+                                                        e.currentTarget.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.transform = 'scale(1)';
+                                                        e.currentTarget.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+                                                    }}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
+                                        </div>
+
+                                        <div onClick={() => setSelectedInquiry(item)} style={{ cursor: 'pointer' }}>
+                                            <div style={{
+                                                fontSize: '14px',
+                                                color: '#475569',
+                                                marginBottom: '12px',
+                                                fontWeight: '500'
+                                            }}>
+                                                {item.subject}
+                                            </div>
+
+                                            <div style={{
+                                                fontSize: '13px',
+                                                color: '#64748b',
+                                                lineHeight: '1.5',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden',
+                                                marginBottom: '16px'
+                                            }}>
+                                                {item.message}
+                                            </div>
+
                                             <div style={{
                                                 display: 'flex',
+                                                justifyContent: 'space-between',
                                                 alignItems: 'center',
-                                                gap: '4px'
+                                                fontSize: '12px',
+                                                color: '#94a3b8'
                                             }}>
-                                                <Calendar size={12} />
-                                                {formatDate(item.createdAt)}
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px'
+                                                }}>
+                                                    <Phone size={12} />
+                                                    {item.userId?.phoneNumber || 'No phone provided'}
+                                                </div>
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px'
+                                                }}>
+                                                    <Calendar size={12} />
+                                                    {formatDate(item.createdAt)}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Inquiry Details Panel */}
                     {selectedInquiry && (
-                        <div style={{
-                            flex: 1,
-                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
-                            backdropFilter: 'blur(10px)',
-                            borderRadius: '20px',
-                            border: '1px solid rgba(255, 255, 255, 0.3)',
-                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-                            padding: '32px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            animation: 'slideIn 0.3s ease-out'
-                        }}>
+                        <div className="details-panel">
+                            {isMobile && (
+                                <button
+                                    onClick={() => setSelectedInquiry(null)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        background: 'none',
+                                        border: 'none',
+                                        color: '#3b82f6',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        marginBottom: '16px',
+                                        padding: 0
+                                    }}
+                                >
+                                    <ArrowLeft size={20} />
+                                    Back to Inquiries
+                                </button>
+                            )}
                             <div style={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
@@ -777,7 +838,7 @@ const Inquiries = ({ token }) => {
                                 borderBottom: '2px solid #f1f5f9'
                             }}>
                                 <h3 style={{
-                                    fontSize: '24px',
+                                    fontSize: isMobile ? '20px' : '24px',
                                     fontWeight: '700',
                                     color: '#1e293b',
                                     display: 'flex',

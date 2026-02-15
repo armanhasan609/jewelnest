@@ -90,14 +90,14 @@ const Product = () => {
             }
 
             // Show success message
-            toast.success(`${quantity} ${quantity === 1 ? 'item' : 'items'} added to cart!`, {
-                position: "top-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true
-            });
+            // toast.success(`${quantity} ${quantity === 1 ? 'item' : 'items'} added to cart!`, {
+            //     position: "top-right",
+            //     autoClose: 2000,
+            //     hideProgressBar: false,
+            //     closeOnClick: true,
+            //     pauseOnHover: true,
+            //     draggable: true
+            // });
 
             // Show alert
             setShowAlert('success');

@@ -68,7 +68,7 @@ const Orders = () => {
 
                         // Fallback image if none found
                         if (images.length === 0) {
-                            images = ['https://via.placeholder.com/150'];
+                            images = ['https://placehold.co/150'];
                         }
 
                         // RECOVER QUANTITY: Check if quantity exists, if not derive from total and price
@@ -95,7 +95,7 @@ const Orders = () => {
                 setOrders(userOrders); // Already sorted from backend usually, but can reverse if needed
 
                 if (userOrders.length > 0) {
-                    toast.success(`Loaded ${userOrders.length} orders`);
+                    // toast.success(`Loaded ${userOrders.length} orders`);
                 }
             } else {
                 toast.error(response.data.message || "Failed to fetch orders");
@@ -487,7 +487,7 @@ const Orders = () => {
                                                             src={getPrimaryImage(item)}
                                                             alt={item.name || 'Product'}
                                                             style={{ width: '4rem', height: '4rem', objectFit: 'cover', borderRadius: '0.375rem', border: '1px solid #e5e7eb' }}
-                                                            onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/64"; }}
+                                                            onError={(e) => { e.currentTarget.src = "https://placehold.co/64"; }}
                                                         />
                                                         <div style={{ flex: 1 }}>
                                                             <p style={{ fontWeight: '600', color: '#374151', fontSize: '0.95rem' }}>{item.name}</p>

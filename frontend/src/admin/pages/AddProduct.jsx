@@ -22,6 +22,14 @@ const AddProduct = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // Fetch SubCategories on Mount
     useEffect(() => {
         const fetchSubCategories = async () => {
@@ -368,7 +376,7 @@ const AddProduct = () => {
         <div style={{
             maxWidth: '1200px',
             margin: '0 auto',
-            padding: '2rem',
+            padding: isMobile ? '1rem' : '2rem',
             background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
             minHeight: '100vh',
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
@@ -377,7 +385,7 @@ const AddProduct = () => {
                 background: 'white',
                 borderRadius: '24px',
                 boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02)',
-                padding: '3rem',
+                padding: isMobile ? '1.5rem' : '3rem',
                 border: '1px solid rgba(226, 232, 240, 0.8)',
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease'
             }}>
@@ -387,7 +395,7 @@ const AddProduct = () => {
                     paddingBottom: '1.5rem'
                 }}>
                     <h2 style={{
-                        fontSize: '2rem',
+                        fontSize: isMobile ? '1.5rem' : '2rem',
                         fontWeight: '800',
                         color: '#1e293b',
                         display: 'flex',
@@ -489,16 +497,18 @@ const AddProduct = () => {
                     {/* Multiple Image Upload Section */}
                     <div style={{
                         background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-                        padding: '2rem',
+                        padding: isMobile ? '1.5rem' : '2rem',
                         borderRadius: '20px',
                         border: '2px solid #dbeafe',
                         boxShadow: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)'
                     }}>
                         <div style={{
                             display: 'flex',
-                            alignItems: 'center',
+                            flexDirection: isMobile ? 'column' : 'row',
+                            alignItems: isMobile ? 'flex-start' : 'center',
                             justifyContent: 'space-between',
-                            marginBottom: '1.5rem'
+                            marginBottom: '1.5rem',
+                            gap: '1rem'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <div style={{
@@ -706,10 +716,10 @@ const AddProduct = () => {
                     {/* Pricing & Stock Grid */}
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
                         gap: '1.5rem',
                         background: 'linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%)',
-                        padding: '2rem',
+                        padding: isMobile ? '1.5rem' : '2rem',
                         borderRadius: '20px',
                         border: '2px solid #fbbf24',
                         boxShadow: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)'
@@ -814,7 +824,7 @@ const AddProduct = () => {
 
                     {/* Daily Sale Section */}
                     <div style={{
-                        padding: '2rem',
+                        padding: isMobile ? '1.5rem' : '2rem',
                         borderRadius: '20px',
                         border: `2px solid ${onSale ? '#10b981' : '#e2e8f0'}`,
                         transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -846,9 +856,11 @@ const AddProduct = () => {
                         </style>
                         <div style={{
                             display: 'flex',
-                            alignItems: 'center',
+                            alignItems: isMobile ? 'flex-start' : 'center',
+                            flexDirection: isMobile ? 'column' : 'row',
                             justifyContent: 'space-between',
-                            marginBottom: '1.5rem'
+                            marginBottom: '1.5rem',
+                            gap: '1rem'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <div style={{
@@ -911,7 +923,7 @@ const AddProduct = () => {
                         {onSale && (
                             <div style={{
                                 display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))',
                                 gap: '1.5rem',
                                 paddingTop: '1.5rem',
                                 borderTop: '1px solid #10b981',

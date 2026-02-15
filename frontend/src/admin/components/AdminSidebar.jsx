@@ -1,4 +1,4 @@
-import { LayoutDashboard, PlusCircle, ShoppingBag, LogOut, Settings, Users, BarChart3, MessageSquare, Package, TrendingUp, Shield, Gem, Crown, Zap, Sparkles, Menu, X } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, ShoppingBag, LogOut, Settings, Users, MessageSquare, Package, TrendingUp, Shield, Gem, Crown, Zap, Sparkles, Menu, X } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
@@ -83,7 +83,6 @@ const AdminSidebar = () => {
         { path: "/admin/add-product", icon: PlusCircle, label: "Add Product", color: "#10b981" },
         { path: "/admin/orders", icon: ShoppingBag, label: "Orders", color: "#f59e0b" },
         { path: "/admin/inquiries", icon: MessageSquare, label: "Inquiries", color: "#ec4899" },
-        { path: "/admin/analytics", icon: BarChart3, label: "Analytics", color: "#06b6d4" },
         { path: "/admin/users", icon: Users, label: "Users", color: "#ef4444" },
     ];
 

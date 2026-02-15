@@ -1,10 +1,15 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { CreditCard, Wallet, Smartphone, Lock, CheckCircle, Truck, Shield, Package, Star } from 'lucide-react';
 
 const PlaceOrder = () => {
+    // Scroll to top on component mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const {
         getCartAmount, delivery_fee, currency,
         backendUrl, cartItems, products,
@@ -118,8 +123,8 @@ const PlaceOrder = () => {
                     name: p.name,
                     price: Number(getProductCurrentPrice(p)),
                     quantity: Number(cartItems[id]),
-                    image: safeImage || "https://via.placeholder.com/150",
-                    images: [safeImage] || ["https://via.placeholder.com/150"],
+                    image: safeImage || "https://placehold.co/150",
+                    images: [safeImage] || ["https://placehold.co/150"],
                     sku: p.sku || 'N/A',
                     category: p.category || 'General',
                     size: p.size || '',
@@ -191,6 +196,10 @@ const PlaceOrder = () => {
                     localStorage.removeItem("cartItems");
                     setOrderPlaced(true);
                     toast.success("Order placed successfully 🎉");
+                    window.scrollTo(0, 0);
+
+
+
                 } else {
                     toast.error(res.data.message || "Order placement failed");
                 }
@@ -293,6 +302,7 @@ const PlaceOrder = () => {
                 localStorage.removeItem("cartItems");
                 setOrderPlaced(true);
                 toast.success("Payment successful! Order confirmed 🎉");
+                window.scrollTo(0, 0);
             } else {
                 toast.error("Payment verification failed");
             }
@@ -300,169 +310,6 @@ const PlaceOrder = () => {
             console.error("Payment verification error:", error);
             toast.error("Payment verification failed");
         }
-    };
-
-    const containerStyle = {
-        padding: '24px',
-        backgroundColor: '#f9fafb',
-        minHeight: 'calc(100vh - 80px)'
-    };
-
-    const mainLayoutStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '32px',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        '@media (minWidth: 1024px)': {
-            flexDirection: 'row'
-        }
-    };
-
-    const sectionContainerStyle = {
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        padding: '32px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
-        border: '1px solid #f3f4f6'
-    };
-
-    const titleStyle = {
-        fontSize: '24px',
-        fontWeight: '700',
-        color: '#1a202c',
-        marginBottom: '24px',
-        paddingBottom: '16px',
-        borderBottom: '2px solid #f3f4f6',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px'
-    };
-
-    const inputContainerStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px'
-    };
-
-    const inputRowStyle = {
-        display: 'flex',
-        gap: '16px',
-        '@media (maxWidth: 640px)': {
-            flexDirection: 'column'
-        }
-    };
-
-    const inputStyle = {
-        padding: '14px 16px',
-        border: '1px solid #d1d5db',
-        borderRadius: '8px',
-        fontSize: '14px',
-        outline: 'none',
-        transition: 'all 0.3s ease',
-        flex: '1',
-        backgroundColor: '#f9fafb'
-    };
-
-    const inputFocusStyle = {
-        borderColor: '#b8860b',
-        backgroundColor: 'white',
-        boxShadow: '0 0 0 3px rgba(184, 134, 11, 0.1)'
-    };
-
-    const errorStyle = {
-        color: '#dc2626',
-        fontSize: '12px',
-        marginTop: '4px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px'
-    };
-
-    const paymentMethodStyle = (method) => ({
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '16px',
-        borderRadius: '12px',
-        border: '2px solid',
-        borderColor: paymentMethod === method ? '#b8860b' : '#e5e7eb',
-        backgroundColor: paymentMethod === method ? '#fef3c7' : 'white',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        flex: '1',
-        minWidth: '200px'
-    });
-
-    const paymentMethodHoverStyle = {
-        borderColor: '#b8860b',
-        transform: 'translateY(-2px)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-    };
-
-    const summaryItemStyle = {
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '12px 0',
-        borderBottom: '1px solid #f3f4f6'
-    };
-
-    const totalAmountStyle = {
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '20px 0',
-        borderTop: '2px solid #e5e7eb',
-        fontSize: '18px',
-        fontWeight: '700',
-        color: '#1a202c'
-    };
-
-    const submitButtonStyle = {
-        width: '100%',
-        padding: '18px',
-        backgroundColor: '#b8860b',
-        color: 'white',
-        border: 'none',
-        borderRadius: '12px',
-        fontSize: '16px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        marginTop: '24px'
-    };
-
-    const submitButtonHoverStyle = {
-        backgroundColor: '#a4710a',
-        transform: 'translateY(-2px)',
-        boxShadow: '0 8px 25px rgba(184, 134, 11, 0.3)'
-    };
-
-    const checkboxStyle = {
-        width: '18px',
-        height: '18px',
-        borderRadius: '4px',
-        border: '2px solid #d1d5db',
-        cursor: 'pointer',
-        accentColor: '#b8860b'
-    };
-
-    const successContainerStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '60px 20px',
-        textAlign: 'center',
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        maxWidth: '600px',
-        margin: '40px auto',
-        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
-        border: '1px solid #f3f4f6'
     };
 
     const submitReview = async () => {
@@ -525,162 +372,128 @@ const PlaceOrder = () => {
 
     if (orderPlaced) {
         return (
-            <div style={containerStyle}>
-                <div style={successContainerStyle}>
+            <div style={{
+                minHeight: '60vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '20px'
+            }}>
+                <div style={{
+                    backgroundColor: 'white',
+                    padding: '40px',
+                    borderRadius: '16px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                    textAlign: 'center',
+                    maxWidth: '500px',
+                    width: '100%'
+                }}>
                     <div style={{
-                        width: '100px',
-                        height: '100px',
-                        borderRadius: '50%',
-                        backgroundColor: '#10b98120',
                         display: 'flex',
-                        alignItems: 'center',
                         justifyContent: 'center',
                         marginBottom: '24px'
                     }}>
-                        <CheckCircle size={48} color="#10b981" />
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: '#ecfdf5',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <CheckCircle size={40} color="#10b981" />
+                        </div>
                     </div>
-                    <h1 style={{
-                        fontSize: '32px',
-                        fontWeight: '700',
-                        color: '#1a202c',
-                        marginBottom: '12px'
-                    }}>
+
+                    <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1a202c', marginBottom: '12px' }}>
                         Order Confirmed!
-                    </h1>
-                    <p style={{
-                        fontSize: '16px',
-                        color: '#6b7280',
-                        marginBottom: '8px',
-                        lineHeight: '1.6'
-                    }}>
-                        Your order has been successfully placed and saved to our database.
+                    </h2>
+
+                    <p style={{ color: '#4b5563', marginBottom: '8px' }}>
+                        Your order has been successfully placed.
                     </p>
-                    <p style={{
-                        fontSize: '14px',
-                        color: '#9ca3af',
-                        marginBottom: '32px'
-                    }}>
+                    <p style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '32px' }}>
                         You will receive a confirmation email shortly.
                     </p>
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <button
                             onClick={() => setShowReviewModal(true)}
                             style={{
-                                padding: '14px 32px',
+                                padding: '14px',
                                 backgroundColor: '#b8860b',
                                 color: 'white',
-                                border: 'none',
                                 borderRadius: '8px',
-                                fontSize: '15px',
                                 fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#a4710a';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = '#b8860b';
-                                e.currentTarget.style.transform = 'translateY(0)';
+                                border: 'none',
+                                cursor: 'pointer'
                             }}
                         >
                             Write a Review
                         </button>
-                        <button
-                            onClick={() => window.location.href = '/orders'}
-                            style={{
-                                padding: '14px 32px',
-                                backgroundColor: '#1a202c',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '15px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#111827';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = '#1a202c';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                            }}
-                        >
-                            View My Orders
-                        </button>
-                        <button
-                            onClick={() => window.location.href = '/'}
-                            style={{
-                                padding: '14px 32px',
-                                backgroundColor: 'white',
-                                color: '#374151',
-                                border: '1px solid #d1d5db',
-                                borderRadius: '8px',
-                                fontSize: '15px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#f9fafb';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'white';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                            }}
-                        >
-                            Continue Shopping
-                        </button>
+
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button
+                                onClick={() => window.location.href = '/orders'}
+                                style={{
+                                    flex: 1,
+                                    padding: '14px',
+                                    backgroundColor: '#1f2937',
+                                    color: 'white',
+                                    borderRadius: '8px',
+                                    fontWeight: '600',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                View Orders
+                            </button>
+                            <button
+                                onClick={() => window.location.href = '/'}
+                                style={{
+                                    flex: 1,
+                                    padding: '14px',
+                                    backgroundColor: 'white',
+                                    color: '#374151',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '8px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Continue Shopping
+                            </button>
+                        </div>
                     </div>
 
                     {/* Review Modal */}
                     {showReviewModal && (
                         <div style={{
                             position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
+                            top: 0, left: 0, right: 0, bottom: 0,
                             backgroundColor: 'rgba(0,0,0,0.5)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            zIndex: 1000
+                            zIndex: 1000,
+                            padding: '20px'
                         }}>
                             <div style={{
                                 backgroundColor: 'white',
-                                borderRadius: '16px',
                                 padding: '32px',
-                                maxWidth: '500px',
-                                width: '90%'
+                                borderRadius: '16px',
+                                width: '100%',
+                                maxWidth: '450px'
                             }}>
-                                <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '16px' }}>Share Your Review</h3>
+                                <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>Share Your Review</h3>
 
                                 {reviewProductIds.length > 1 && (
                                     <select
                                         value={reviewProductId || ''}
                                         onChange={(e) => setReviewProductId(e.target.value)}
-                                        style={{
-                                            width: '100%',
-                                            borderRadius: '8px',
-                                            border: '1px solid #e5e7eb',
-                                            padding: '10px',
-                                            marginBottom: '16px',
-                                            fontSize: '14px'
-                                        }}
+                                        style={{ width: '100%', padding: '10px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
                                     >
                                         <option value="" disabled>Select product</option>
                                         {reviewProductIds.map((pid) => {
@@ -694,14 +507,14 @@ const PlaceOrder = () => {
                                     </select>
                                 )}
 
-                                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px' }}>
+                                <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
                                     {[1, 2, 3, 4, 5].map((n) => (
                                         <button
                                             key={n}
                                             onClick={() => setReviewRating(n)}
-                                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                         >
-                                            <Star size={24} style={{ color: n <= reviewRating ? '#fbbf24' : '#d1d5db', fill: n <= reviewRating ? '#fbbf24' : 'none' }} />
+                                            <Star size={28} style={{ color: n <= reviewRating ? '#fbbf24' : '#d1d5db', fill: n <= reviewRating ? '#fbbf24' : 'none' }} />
                                         </button>
                                     ))}
                                 </div>
@@ -712,11 +525,12 @@ const PlaceOrder = () => {
                                     rows={4}
                                     style={{
                                         width: '100%',
-                                        borderRadius: '8px',
-                                        border: '1px solid #e5e7eb',
                                         padding: '12px',
-                                        marginBottom: '16px',
-                                        fontSize: '14px'
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '8px',
+                                        marginBottom: '20px',
+                                        fontSize: '14px',
+                                        resize: 'none'
                                     }}
                                 />
                                 <div style={{ display: 'flex', gap: '12px' }}>
@@ -724,12 +538,13 @@ const PlaceOrder = () => {
                                         onClick={() => setShowReviewModal(false)}
                                         style={{
                                             flex: 1,
-                                            padding: '10px',
+                                            padding: '12px',
                                             backgroundColor: '#f3f4f6',
+                                            color: '#374151',
                                             border: 'none',
                                             borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            fontWeight: '600'
+                                            fontWeight: '600',
+                                            cursor: 'pointer'
                                         }}
                                     >
                                         Skip
@@ -739,13 +554,13 @@ const PlaceOrder = () => {
                                         disabled={reviewSubmitting}
                                         style={{
                                             flex: 1,
-                                            padding: '10px',
+                                            padding: '12px',
                                             backgroundColor: '#b8860b',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '8px',
-                                            cursor: reviewSubmitting ? 'not-allowed' : 'pointer',
                                             fontWeight: '600',
+                                            cursor: 'pointer',
                                             opacity: reviewSubmitting ? 0.7 : 1
                                         }}
                                     >
@@ -762,63 +577,19 @@ const PlaceOrder = () => {
 
     if (cartCount === 0) {
         return (
-            <div style={{
-                ...containerStyle,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <div style={{
-                    width: '120px',
-                    height: '120px',
-                    borderRadius: '50%',
-                    backgroundColor: '#f3f4f6',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '24px'
-                }}>
+            <div className="place-order-container empty-state">
+                <div className="empty-cart-icon">
                     <Package size={48} color="#9ca3af" />
                 </div>
-                <h1 style={{
-                    fontSize: '24px',
-                    fontWeight: '600',
-                    color: '#4b5563',
-                    marginBottom: '12px'
-                }}>
+                <h1 className="empty-cart-title">
                     Your cart is empty
                 </h1>
-                <p style={{
-                    fontSize: '14px',
-                    color: '#6b7280',
-                    marginBottom: '32px',
-                    textAlign: 'center',
-                    maxWidth: '400px'
-                }}>
+                <p className="empty-cart-message">
                     Add some items to your cart before proceeding to checkout.
                 </p>
                 <button
                     onClick={() => window.location.href = '/'}
-                    style={{
-                        padding: '14px 32px',
-                        backgroundColor: '#b8860b',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontSize: '15px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#a4710a';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#b8860b';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                    }}
+                    className="continue-shopping-btn"
                 >
                     Continue Shopping
                 </button>
@@ -827,57 +598,45 @@ const PlaceOrder = () => {
     }
 
     return (
-        <div style={containerStyle}>
-            <div style={mainLayoutStyle}>
+        <div className="place-order-container">
+            <div className="order-layout">
                 {/* Left Column: Delivery Information */}
-                <div style={{ flex: '2' }}>
-                    <div style={sectionContainerStyle}>
-                        <h2 style={titleStyle}>
+                <div className="left-column">
+                    <div className="section-container">
+                        <h2 className="section-title">
                             <Truck size={24} color="#b8860b" />
                             Delivery Information
                         </h2>
 
                         <form onSubmit={handlePlaceOrder}>
-                            <div style={inputContainerStyle}>
+                            <div className="input-group">
                                 {/* Name Row */}
-                                <div style={inputRowStyle}>
-                                    <div style={{ flex: '1' }}>
+                                <div className="input-row">
+                                    <div className="input-wrapper">
                                         <input
                                             name="firstName"
                                             onChange={handleInputChange}
                                             value={formData.firstName}
                                             placeholder="First name *"
-                                            style={inputStyle}
-                                            onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                                            onBlur={(e) => {
-                                                e.target.style.borderColor = errors.firstName ? '#dc2626' : '#d1d5db';
-                                                e.target.style.backgroundColor = '#f9fafb';
-                                                e.target.style.boxShadow = 'none';
-                                            }}
+                                            className={`form-input ${errors.firstName ? 'error' : ''}`}
                                         />
                                         {errors.firstName && (
-                                            <div style={errorStyle}>
+                                            <div className="error-text">
                                                 <span>⚠️</span>
                                                 {errors.firstName}
                                             </div>
                                         )}
                                     </div>
-                                    <div style={{ flex: '1' }}>
+                                    <div className="input-wrapper">
                                         <input
                                             name="lastName"
                                             onChange={handleInputChange}
                                             value={formData.lastName}
                                             placeholder="Last name *"
-                                            style={inputStyle}
-                                            onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                                            onBlur={(e) => {
-                                                e.target.style.borderColor = errors.lastName ? '#dc2626' : '#d1d5db';
-                                                e.target.style.backgroundColor = '#f9fafb';
-                                                e.target.style.boxShadow = 'none';
-                                            }}
+                                            className={`form-input ${errors.lastName ? 'error' : ''}`}
                                         />
                                         {errors.lastName && (
-                                            <div style={errorStyle}>
+                                            <div className="error-text">
                                                 <span>⚠️</span>
                                                 {errors.lastName}
                                             </div>
@@ -893,16 +652,10 @@ const PlaceOrder = () => {
                                         onChange={handleInputChange}
                                         value={formData.email}
                                         placeholder="Email address *"
-                                        style={inputStyle}
-                                        onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                                        onBlur={(e) => {
-                                            e.target.style.borderColor = errors.email ? '#dc2626' : '#d1d5db';
-                                            e.target.style.backgroundColor = '#f9fafb';
-                                            e.target.style.boxShadow = 'none';
-                                        }}
+                                        className={`form-input ${errors.email ? 'error' : ''}`}
                                     />
                                     {errors.email && (
-                                        <div style={errorStyle}>
+                                        <div className="error-text">
                                             <span>⚠️</span>
                                             {errors.email}
                                         </div>
@@ -916,16 +669,10 @@ const PlaceOrder = () => {
                                         onChange={handleInputChange}
                                         value={formData.street}
                                         placeholder="Street address *"
-                                        style={inputStyle}
-                                        onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                                        onBlur={(e) => {
-                                            e.target.style.borderColor = errors.street ? '#dc2626' : '#d1d5db';
-                                            e.target.style.backgroundColor = '#f9fafb';
-                                            e.target.style.boxShadow = 'none';
-                                        }}
+                                        className={`form-input ${errors.street ? 'error' : ''}`}
                                     />
                                     {errors.street && (
-                                        <div style={errorStyle}>
+                                        <div className="error-text">
                                             <span>⚠️</span>
                                             {errors.street}
                                         </div>
@@ -933,44 +680,32 @@ const PlaceOrder = () => {
                                 </div>
 
                                 {/* City and State */}
-                                <div style={inputRowStyle}>
-                                    <div style={{ flex: '1' }}>
+                                <div className="input-row">
+                                    <div className="input-wrapper">
                                         <input
                                             name="city"
                                             onChange={handleInputChange}
                                             value={formData.city}
                                             placeholder="City *"
-                                            style={inputStyle}
-                                            onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                                            onBlur={(e) => {
-                                                e.target.style.borderColor = errors.city ? '#dc2626' : '#d1d5db';
-                                                e.target.style.backgroundColor = '#f9fafb';
-                                                e.target.style.boxShadow = 'none';
-                                            }}
+                                            className={`form-input ${errors.city ? 'error' : ''}`}
                                         />
                                         {errors.city && (
-                                            <div style={errorStyle}>
+                                            <div className="error-text">
                                                 <span>⚠️</span>
                                                 {errors.city}
                                             </div>
                                         )}
                                     </div>
-                                    <div style={{ flex: '1' }}>
+                                    <div className="input-wrapper">
                                         <input
                                             name="state"
                                             onChange={handleInputChange}
                                             value={formData.state}
                                             placeholder="State *"
-                                            style={inputStyle}
-                                            onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                                            onBlur={(e) => {
-                                                e.target.style.borderColor = errors.state ? '#dc2626' : '#d1d5db';
-                                                e.target.style.backgroundColor = '#f9fafb';
-                                                e.target.style.boxShadow = 'none';
-                                            }}
+                                            className={`form-input ${errors.state ? 'error' : ''}`}
                                         />
                                         {errors.state && (
-                                            <div style={errorStyle}>
+                                            <div className="error-text">
                                                 <span>⚠️</span>
                                                 {errors.state}
                                             </div>
@@ -979,45 +714,33 @@ const PlaceOrder = () => {
                                 </div>
 
                                 {/* Pincode and Phone */}
-                                <div style={inputRowStyle}>
-                                    <div style={{ flex: '1' }}>
+                                <div className="input-row">
+                                    <div className="input-wrapper">
                                         <input
                                             name="pincode"
                                             onChange={handleInputChange}
                                             value={formData.pincode}
                                             placeholder="Pincode *"
-                                            style={inputStyle}
-                                            onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                                            onBlur={(e) => {
-                                                e.target.style.borderColor = errors.pincode ? '#dc2626' : '#d1d5db';
-                                                e.target.style.backgroundColor = '#f9fafb';
-                                                e.target.style.boxShadow = 'none';
-                                            }}
+                                            className={`form-input ${errors.pincode ? 'error' : ''}`}
                                         />
                                         {errors.pincode && (
-                                            <div style={errorStyle}>
+                                            <div className="error-text">
                                                 <span>⚠️</span>
                                                 {errors.pincode}
                                             </div>
                                         )}
                                     </div>
-                                    <div style={{ flex: '1' }}>
+                                    <div className="input-wrapper">
                                         <input
                                             name="phone"
                                             type="tel"
                                             onChange={handleInputChange}
                                             value={formData.phone}
                                             placeholder="Phone number *"
-                                            style={inputStyle}
-                                            onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                                            onBlur={(e) => {
-                                                e.target.style.borderColor = errors.phone ? '#dc2626' : '#d1d5db';
-                                                e.target.style.backgroundColor = '#f9fafb';
-                                                e.target.style.boxShadow = 'none';
-                                            }}
+                                            className={`form-input ${errors.phone ? 'error' : ''}`}
                                         />
                                         {errors.phone && (
-                                            <div style={errorStyle}>
+                                            <div className="error-text">
                                                 <span>⚠️</span>
                                                 {errors.phone}
                                             </div>
@@ -1030,53 +753,45 @@ const PlaceOrder = () => {
                 </div>
 
                 {/* Right Column: Order Summary & Payment */}
-                <div style={{ flex: '1' }}>
+                <div className="right-column">
                     {/* Order Summary */}
-                    <div style={sectionContainerStyle}>
-                        <h2 style={titleStyle}>
+                    <div className="section-container">
+                        <h2 className="section-title">
                             <Package size={24} color="#b8860b" />
                             Order Summary
                         </h2>
 
                         <div>
-                            <div style={summaryItemStyle}>
-                                <span style={{ color: '#6b7280' }}>Subtotal ({cartCount} items)</span>
-                                <span style={{ fontWeight: '600' }}>{currency}{cartTotal.toFixed(2)}</span>
+                            <div className="summary-item">
+                                <span className="summary-label">Subtotal ({cartCount} items)</span>
+                                <span className="summary-value">{currency}{cartTotal.toFixed(2)}</span>
                             </div>
 
                             {discount > 0 && (
-                                <div style={summaryItemStyle}>
-                                    <span style={{ color: '#6b7280' }}>Discount (10% off)</span>
-                                    <span style={{ color: '#10b981', fontWeight: '600' }}>-{currency}{discount.toFixed(2)}</span>
+                                <div className="summary-item">
+                                    <span className="summary-label">Discount (10% off)</span>
+                                    <span className="summary-value discount">-{currency}{discount.toFixed(2)}</span>
                                 </div>
                             )}
 
-                            <div style={summaryItemStyle}>
-                                <span style={{ color: '#6b7280' }}>Shipping</span>
+                            <div className="summary-item">
+                                <span className="summary-label">Shipping</span>
                                 <span>
                                     {isFreeShipping ? (
-                                        <span style={{ color: '#10b981', fontWeight: '600' }}>FREE</span>
+                                        <span className="free-shipping">FREE</span>
                                     ) : (
-                                        <span style={{ fontWeight: '600' }}>{currency}{shippingFee.toFixed(2)}</span>
+                                        <span className="summary-value">{currency}{shippingFee.toFixed(2)}</span>
                                     )}
                                 </span>
                             </div>
 
                             {!isFreeShipping && cartTotal < FREE_SHIPPING_THRESHOLD && (
-                                <div style={{
-                                    fontSize: '12px',
-                                    color: '#f59e0b',
-                                    marginTop: '8px',
-                                    padding: '8px',
-                                    backgroundColor: '#fef3c7',
-                                    borderRadius: '6px',
-                                    textAlign: 'center'
-                                }}>
+                                <div className="free-shipping-nudge">
                                     Add {currency}{(FREE_SHIPPING_THRESHOLD - cartTotal).toFixed(2)} more for free shipping!
                                 </div>
                             )}
 
-                            <div style={totalAmountStyle}>
+                            <div className="total-row">
                                 <span>Total Amount</span>
                                 <span>{currency}{orderTotal.toFixed(2)}</span>
                             </div>
@@ -1084,100 +799,48 @@ const PlaceOrder = () => {
                     </div>
 
                     {/* Payment Method */}
-                    <div style={{ ...sectionContainerStyle, marginTop: '24px' }}>
-                        <h2 style={titleStyle}>
+                    <div className="section-container payment-section">
+                        <h2 className="section-title">
                             <CreditCard size={24} color="#b8860b" />
                             Payment Method
                         </h2>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div className="payment-methods">
                             <div
-                                style={paymentMethodStyle('cod')}
+                                className={`payment-method-card ${paymentMethod === 'cod' ? 'active' : ''}`}
                                 onClick={() => setPaymentMethod('cod')}
-                                onMouseEnter={(e) => {
-                                    if (paymentMethod !== 'cod') {
-                                        Object.assign(e.currentTarget.style, paymentMethodHoverStyle);
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (paymentMethod !== 'cod') {
-                                        e.currentTarget.style.borderColor = '#e5e7eb';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }
-                                }}
                             >
-                                <div style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    borderRadius: '50%',
-                                    border: '2px solid',
-                                    borderColor: paymentMethod === 'cod' ? '#b8860b' : '#d1d5db',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
+                                <div className="radio-circle">
                                     {paymentMethod === 'cod' && (
-                                        <div style={{
-                                            width: '10px',
-                                            height: '10px',
-                                            borderRadius: '50%',
-                                            backgroundColor: '#b8860b'
-                                        }}></div>
+                                        <div className="radio-dot"></div>
                                     )}
                                 </div>
                                 <Wallet size={20} color="#6b7280" />
                                 <div>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#1a202c' }}>
+                                    <div className="method-title">
                                         Cash on Delivery
                                     </div>
-                                    <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+                                    <div className="method-subtitle">
                                         Pay when you receive
                                     </div>
                                 </div>
                             </div>
 
                             <div
-                                style={paymentMethodStyle('razorpay')}
+                                className={`payment-method-card ${paymentMethod === 'razorpay' ? 'active' : ''}`}
                                 onClick={() => setPaymentMethod('razorpay')}
-                                onMouseEnter={(e) => {
-                                    if (paymentMethod !== 'razorpay') {
-                                        Object.assign(e.currentTarget.style, paymentMethodHoverStyle);
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (paymentMethod !== 'razorpay') {
-                                        e.currentTarget.style.borderColor = '#e5e7eb';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }
-                                }}
                             >
-                                <div style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    borderRadius: '50%',
-                                    border: '2px solid',
-                                    borderColor: paymentMethod === 'razorpay' ? '#b8860b' : '#d1d5db',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
+                                <div className="radio-circle">
                                     {paymentMethod === 'razorpay' && (
-                                        <div style={{
-                                            width: '10px',
-                                            height: '10px',
-                                            borderRadius: '50%',
-                                            backgroundColor: '#b8860b'
-                                        }}></div>
+                                        <div className="radio-dot"></div>
                                     )}
                                 </div>
                                 <Smartphone size={20} color="#6b7280" />
                                 <div>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#1a202c' }}>
+                                    <div className="method-title">
                                         Razorpay
                                     </div>
-                                    <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+                                    <div className="method-subtitle">
                                         UPI, Cards & Wallets
                                     </div>
                                 </div>
@@ -1185,34 +848,27 @@ const PlaceOrder = () => {
                         </div>
 
                         {/* Terms & Conditions */}
-                        <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #f3f4f6' }}>
-                            <label style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                color: '#374151'
-                            }}>
+                        <div className="terms-section">
+                            <label className="terms-label">
                                 <input
                                     type="checkbox"
                                     checked={agreeToTerms}
                                     onChange={(e) => setAgreeToTerms(e.target.checked)}
-                                    style={checkboxStyle}
+                                    className="terms-checkbox"
                                 />
                                 <div>
                                     I agree to the{' '}
-                                    <a href="/terms" style={{ color: '#b8860b', textDecoration: 'none' }}>
+                                    <a href="/terms" className="terms-link">
                                         Terms and Conditions
                                     </a>
                                     {' '}and{' '}
-                                    <a href="/privacy" style={{ color: '#b8860b', textDecoration: 'none' }}>
+                                    <a href="/privacy" className="terms-link">
                                         Privacy Policy
                                     </a>
                                 </div>
                             </label>
                             {errors.terms && (
-                                <div style={errorStyle}>
+                                <div className="error-text">
                                     <span>⚠️</span>
                                     {errors.terms}
                                 </div>
@@ -1220,18 +876,9 @@ const PlaceOrder = () => {
                         </div>
 
                         {/* Security Note */}
-                        <div style={{
-                            marginTop: '20px',
-                            padding: '12px',
-                            backgroundColor: '#f0f9ff',
-                            borderRadius: '8px',
-                            border: '1px solid #bae6fd',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px'
-                        }}>
+                        <div className="security-note">
                             <Shield size={16} color="#0369a1" />
-                            <div style={{ fontSize: '12px', color: '#0369a1' }}>
+                            <div className="security-text">
                                 Your payment information is secure and encrypted.
                             </div>
                         </div>
@@ -1240,34 +887,11 @@ const PlaceOrder = () => {
                         <button
                             onClick={handlePlaceOrder}
                             disabled={loading || cartCount === 0}
-                            style={{
-                                ...submitButtonStyle,
-                                backgroundColor: loading || cartCount === 0 ? '#9ca3af' : '#b8860b',
-                                cursor: loading || cartCount === 0 ? 'not-allowed' : 'pointer'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!loading && cartCount > 0) {
-                                    Object.assign(e.currentTarget.style, submitButtonHoverStyle);
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!loading && cartCount > 0) {
-                                    e.currentTarget.style.backgroundColor = '#b8860b';
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }
-                            }}
+                            className={`place-order-btn ${loading || cartCount === 0 ? 'disabled' : ''}`}
                         >
                             {loading ? (
                                 <>
-                                    <div style={{
-                                        width: '16px',
-                                        height: '16px',
-                                        border: '2px solid rgba(255,255,255,0.3)',
-                                        borderTopColor: 'white',
-                                        borderRadius: '50%',
-                                        animation: 'spin 1s linear infinite'
-                                    }}></div>
+                                    <div className="spinner"></div>
                                     Processing Order...
                                 </>
                             ) : (
@@ -1281,11 +905,557 @@ const PlaceOrder = () => {
                 </div>
             </div>
 
-            {/* CSS Animations */}
+            {/* CSS Styles */}
             <style>{`
+                .place-order-container {
+                    padding: 24px;
+                    background-color: #f9fafb;
+                    min-height: calc(100vh - 80px);
+                }
+
+                .place-order-container.empty-state {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .order-layout {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 32px;
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+
+                .left-column {
+                    flex: 2;
+                }
+
+                .right-column {
+                    flex: 1;
+                }
+
+                .section-container {
+                    background-color: white;
+                    border-radius: 16px;
+                    padding: 32px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                    border: 1px solid #f3f4f6;
+                }
+
+                .section-title {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #1a202c;
+                    margin-bottom: 24px;
+                    padding-bottom: 16px;
+                    border-bottom: 2px solid #f3f4f6;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+
+                .input-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                }
+
+                .input-row {
+                    display: flex;
+                    gap: 16px;
+                }
+
+                .input-wrapper {
+                    flex: 1;
+                }
+
+                .form-input {
+                    width: 100%;
+                    padding: 14px 16px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    outline: none;
+                    transition: all 0.3s ease;
+                    background-color: #f9fafb;
+                    box-sizing: border-box;
+                }
+
+                .form-input:focus {
+                    border-color: #b8860b;
+                    background-color: white;
+                    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+                }
+
+                .form-input.error {
+                    border-color: #dc2626;
+                }
+
+                .error-text {
+                    color: #dc2626;
+                    font-size: 12px;
+                    margin-top: 4px;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .summary-item {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 12px 0;
+                    border-bottom: 1px solid #f3f4f6;
+                }
+
+                .summary-label {
+                    color: #6b7280;
+                }
+
+                .summary-value {
+                    font-weight: 600;
+                }
+
+                .summary-value.discount {
+                    color: #10b981;
+                }
+
+                .free-shipping {
+                    color: #10b981;
+                    font-weight: 600;
+                }
+
+                .free-shipping-nudge {
+                   font-size: 12px;
+                   color: #f59e0b;
+                   margin-top: 8px;
+                   padding: 8px;
+                   background-color: #fef3c7;
+                   border-radius: 6px;
+                   text-align: center;
+                }
+
+                .total-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 20px 0;
+                    border-top: 2px solid #e5e7eb;
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #1a202c;
+                }
+
+                .payment-section {
+                    margin-top: 24px;
+                }
+
+                .payment-methods {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+
+                .payment-method-card {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 16px;
+                    border-radius: 12px;
+                    border: 2px solid #e5e7eb;
+                    background-color: white;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    flex: 1;
+                    min-width: 200px;
+                }
+
+                .payment-method-card:hover {
+                    border-color: #b8860b;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                }
+
+                .payment-method-card.active {
+                    border-color: #b8860b;
+                    background-color: #fef3c7;
+                }
+
+                .radio-circle {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    border: 2px solid;
+                    border-color: #d1d5db;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .payment-method-card.active .radio-circle {
+                    border-color: #b8860b;
+                }
+
+                .radio-dot {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background-color: #b8860b;
+                }
+
+                .method-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #1a202c;
+                }
+
+                .method-subtitle {
+                    font-size: 12px;
+                    color: #9ca3af;
+                }
+                
+                .terms-section {
+                    margin-top: 24px; 
+                    padding-top: 24px; 
+                    border-top: 1px solid #f3f4f6; 
+                }
+                
+                .terms-label {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    color: #374151;
+                }
+                
+                .terms-checkbox {
+                     width: 18px;
+                     height: 18px;
+                     border-radius: 4px;
+                     border: 2px solid #d1d5db;
+                     cursor: pointer;
+                     accent-color: #b8860b;
+                }
+                
+                .terms-link {
+                    color: #b8860b;
+                    text-decoration: none;
+                }
+                
+                .security-note {
+                    margin-top: 20px;
+                    padding: 12px;
+                    background-color: #f0f9ff;
+                    border-radius: 8px;
+                    border: 1px solid #bae6fd;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+                
+                .security-text {
+                    font-size: 12px;
+                    color: #0369a1;
+                }
+
+                .place-order-btn {
+                    width: 100%;
+                    padding: 18px;
+                    background-color: #b8860b;
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    margin-top: 24px;
+                }
+                
+                .place-order-btn:not(.disabled):hover {
+                    background-color: #a4710a;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(184, 134, 11, 0.3);
+                }
+                
+                .place-order-btn.disabled {
+                    background-color: #9ca3af;
+                    cursor: not-allowed;
+                }
+                
+                .spinner {
+                    width: 16px;
+                    height: 16px;
+                    border: 2px solid rgba(255,255,255,0.3);
+                    border-top-color: white;
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite;
+                }
+                
+                /* Success and Empty States */
+                .success-card {
+                     display: flex;
+                     flex-direction: column;
+                     align-items: center;
+                     justify-content: center;
+                     padding: 60px 20px;
+                     text-align: center;
+                     background-color: white;
+                     border-radius: 20px;
+                     max-width: 600px;
+                     margin: 40px auto;
+                     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+                     border: 1px solid #f3f4f6;
+                }
+                
+                .success-icon-wrapper {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                    background-color: rgba(16, 185, 129, 0.13);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 24px;
+                }
+                
+                .success-title {
+                    font-size: 32px;
+                    font-weight: 700;
+                    color: #1a202c;
+                    margin-bottom: 12px;
+                }
+                
+                .success-message {
+                     font-size: 16px;
+                     color: #6b7280;
+                     margin-bottom: 8px;
+                     line-height: 1.6;
+                }
+                
+                .success-submessage {
+                     font-size: 14px;
+                     color: #9ca3af;
+                     margin-bottom: 32px;
+                }
+                
+                .success-actions {
+                    display: flex;
+                    gap: 16px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+                
+                .action-btn {
+                     padding: 14px 32px;
+                     border-radius: 8px;
+                     font-size: 15px;
+                     font-weight: 600;
+                     cursor: pointer;
+                     transition: all 0.3s ease;
+                     display: flex;
+                     align-items: center;
+                     gap: 8px;
+                     border: none;
+                }
+                
+                .action-btn:hover {
+                    transform: translateY(-2px);
+                }
+                
+                .action-btn.primary {
+                    background-color: #b8860b;
+                    color: white;
+                }
+                
+                .action-btn.primary:hover {
+                     background-color: #a4710a;
+                }
+                
+                .action-btn.secondary {
+                    background-color: #1a202c;
+                    color: white;
+                }
+                
+                .action-btn.secondary:hover {
+                    background-color: #111827;
+                }
+                
+                .action-btn.outline {
+                    background-color: white;
+                    color: #374151;
+                    border: 1px solid #d1d5db;
+                }
+                
+                .action-btn.outline:hover {
+                    background-color: #f9fafb;
+                }
+                
+                /* Modal */
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0,0,0,0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                }
+                
+                .modal-content {
+                    background-color: white;
+                    border-radius: 16px;
+                    padding: 32px;
+                    max-width: 500px;
+                    width: 90%;
+                }
+                
+                .modal-title {
+                    font-size: 20px;
+                    font-weight: 700;
+                    margin-bottom: 16px;
+                }
+                
+                .modal-select, .modal-textarea {
+                     width: 100%;
+                     border-radius: 8px;
+                     border: 1px solid #e5e7eb;
+                     padding: 10px;
+                     margin-bottom: 16px;
+                     font-size: 14px;
+                }
+                
+                .modal-textarea {
+                    padding: 12px;
+                }
+                
+                .rating-stars {
+                    display: flex;
+                    gap: 6px;
+                    margin-bottom: 16px;
+                }
+                
+                .star-btn {
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    padding: 0;
+                }
+                
+                .modal-actions {
+                    display: flex;
+                    gap: 12px;
+                }
+                
+                .modal-btn {
+                    flex: 1;
+                    padding: 10px;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                }
+                
+                .modal-btn.secondary {
+                    background-color: #f3f4f6;
+                }
+                
+                .modal-btn.primary {
+                    background-color: #b8860b;
+                    color: white;
+                }
+                
+                .modal-btn.primary.disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
+                }
+                
+                /* Empty Cart */
+                .empty-cart-icon {
+                     width: 120px;
+                     height: 120px;
+                     border-radius: 50%;
+                     background-color: #f3f4f6;
+                     display: flex;
+                     align-items: center;
+                     justify-content: center;
+                     margin-bottom: 24px;
+                }
+                
+                .empty-cart-title {
+                     font-size: 24px;
+                     font-weight: 600;
+                     color: #4b5563;
+                     margin-bottom: 12px;
+                }
+                
+                .empty-cart-message {
+                     font-size: 14px;
+                     color: #6b7280;
+                     margin-bottom: 32px;
+                     text-align: center;
+                     max-width: 400px;
+                }
+                
+                .continue-shopping-btn {
+                     padding: 14px 32px;
+                     background-color: #b8860b;
+                     color: white;
+                     border: none;
+                     border-radius: 8px;
+                     font-size: 15px;
+                     font-weight: 600;
+                     cursor: pointer;
+                     transition: all 0.3s ease;
+                }
+                
+                .continue-shopping-btn:hover {
+                    background-color: #a4710a;
+                    transform: translateY(-2px);
+                }
+
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
+                }
+
+                /* Responsive */
+                @media (min-width: 1024px) {
+                    .order-layout {
+                        flex-direction: row;
+                    }
+                }
+
+                @media (max-width: 640px) {
+                    .input-row {
+                        flex-direction: column;
+                    }
+                    
+                    .payment-methods {
+                        flex-direction: column; 
+                    }
+                    
+                    .success-actions {
+                        flex-direction: column;
+                        width: 100%;
+                    }
+                    
+                    .action-btn {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                    
+                    .section-container {
+                        padding: 20px;
+                    }
                 }
             `}</style>
         </div>

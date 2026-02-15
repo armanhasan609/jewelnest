@@ -6,6 +6,7 @@ export const ShopContext = createContext();
 
 const ShopContextProvider = ({ children }) => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    // const backendUrl = ;
     const currency = "₹";
     const delivery_fee = 50;
     const FREE_SHIPPING_THRESHOLD = 499;
@@ -93,7 +94,6 @@ const ShopContextProvider = ({ children }) => {
             ...prev,
             [productId]: (prev[productId] || 0) + 1,
         }));
-        toast.success("Item added to cart"); // Optional feedback
     };
 
     const removeFromCart = (productId) => {

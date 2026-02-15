@@ -655,81 +655,25 @@ const Orders = () => {
                     <table style={{ minWidth: '100%', borderCollapse: 'collapse' }}>
                         <thead style={{ backgroundColor: '#f9fafb' }}>
                             <tr>
-                                <th style={{
-                                    padding: '12px 24px',
-                                    textAlign: 'left',
-                                    fontSize: '12px',
-                                    fontWeight: '500',
-                                    color: '#6b7280',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}>
+                                <th className="table-header">
                                     Order ID
                                 </th>
-                                <th style={{
-                                    padding: '12px 24px',
-                                    textAlign: 'left',
-                                    fontSize: '12px',
-                                    fontWeight: '500',
-                                    color: '#6b7280',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}>
+                                <th className="table-header">
                                     Customer
                                 </th>
-                                <th style={{
-                                    padding: '12px 24px',
-                                    textAlign: 'left',
-                                    fontSize: '12px',
-                                    fontWeight: '500',
-                                    color: '#6b7280',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}>
+                                <th className="table-header">
                                     Items
                                 </th>
-                                <th style={{
-                                    padding: '12px 24px',
-                                    textAlign: 'left',
-                                    fontSize: '12px',
-                                    fontWeight: '500',
-                                    color: '#6b7280',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}>
+                                <th className="table-header">
                                     Amount
                                 </th>
-                                <th style={{
-                                    padding: '12px 24px',
-                                    textAlign: 'left',
-                                    fontSize: '12px',
-                                    fontWeight: '500',
-                                    color: '#6b7280',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}>
+                                <th className="table-header">
                                     Status
                                 </th>
-                                <th style={{
-                                    padding: '12px 24px',
-                                    textAlign: 'left',
-                                    fontSize: '12px',
-                                    fontWeight: '500',
-                                    color: '#6b7280',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}>
+                                <th className="table-header">
                                     Date
                                 </th>
-                                <th style={{
-                                    padding: '12px 24px',
-                                    textAlign: 'left',
-                                    fontSize: '12px',
-                                    fontWeight: '500',
-                                    color: '#6b7280',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}>
+                                <th className="table-header">
                                     Actions
                                 </th>
                             </tr>
@@ -744,7 +688,7 @@ const Orders = () => {
                                     }}
                                         onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
                                         onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                                        <td style={{ padding: '16px 24px', whiteSpace: 'nowrap' }}>
+                                        <td className="table-cell">
                                             <div style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>
                                                 #{order._id.slice(-8)}
                                             </div>
@@ -752,7 +696,7 @@ const Orders = () => {
                                                 {order.paymentMethod}
                                             </div>
                                         </td>
-                                        <td style={{ padding: '16px 24px' }}>
+                                        <td className="table-cell">
                                             <div style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>
                                                 {order.customerName}
                                             </div>
@@ -763,7 +707,7 @@ const Orders = () => {
                                                 {order.phoneNumber}
                                             </div>
                                         </td>
-                                        <td style={{ padding: '16px 24px' }}>
+                                        <td className="table-cell">
                                             <div style={{ fontSize: '14px', color: '#111827' }}>
                                                 {order.items?.length || 0} items
                                             </div>
@@ -779,7 +723,7 @@ const Orders = () => {
                                                 {order.items?.length > 2 && '...'}
                                             </div>
                                         </td>
-                                        <td style={{ padding: '16px 24px', whiteSpace: 'nowrap' }}>
+                                        <td className="table-cell" style={{ whiteSpace: 'nowrap' }}>
                                             <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827' }}>
                                                 ₹{parseFloat(order.totalAmount || 0).toLocaleString('en-IN')}
                                             </div>
@@ -795,7 +739,7 @@ const Orders = () => {
                                                 {order.payment ? 'Paid' : 'Pending'}
                                             </div>
                                         </td>
-                                        <td style={{ padding: '16px 24px', whiteSpace: 'nowrap' }}>
+                                        <td className="table-cell" style={{ whiteSpace: 'nowrap' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 {getStatusIcon(order.status)}
                                                 <select
@@ -821,10 +765,10 @@ const Orders = () => {
                                                 </select>
                                             </div>
                                         </td>
-                                        <td style={{ padding: '16px 24px', whiteSpace: 'nowrap', fontSize: '14px', color: '#6b7280' }}>
+                                        <td className="table-cell" style={{ whiteSpace: 'nowrap', color: '#6b7280' }}>
                                             {order.formattedDate}
                                         </td>
-                                        <td style={{ padding: '16px 24px', whiteSpace: 'nowrap', fontSize: '14px', fontWeight: '500' }}>
+                                        <td className="table-cell" style={{ whiteSpace: 'nowrap', fontWeight: '500' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <button
                                                     onClick={() => fetchOrderDetails(order._id)}
@@ -888,13 +832,7 @@ const Orders = () => {
 
                 {/* Pagination */}
                 {pagination.pages > 1 && (
-                    <div style={{
-                        padding: '16px 24px',
-                        borderTop: '1px solid #e5e7eb',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                    }}>
+                    <div className="pagination-container">
                         <div style={{ fontSize: '14px', color: '#374151' }}>
                             Showing page {pagination.page} of {pagination.pages}
                         </div>
@@ -1184,6 +1122,49 @@ const Orders = () => {
                     }
                     .action-button {
                         padding: 8px;
+                    }
+                }
+
+                .table-header {
+                    padding: 12px 24px;
+                    text-align: left;
+                    font-size: 12px;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    color: #6b7280;
+                    white-space: nowrap;
+                    background-color: #f9fafb;
+                }
+                
+                .table-cell {
+                     padding: 16px 24px;
+                     vertical-align: top;
+                     border-bottom: 1px solid #e5e7eb;
+                }
+
+                .pagination-container {
+                    padding: 16px 24px;
+                    border-top: 1px solid #e5e7eb;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+
+                @media (max-width: 768px) {
+                    .table-header, .table-cell {
+                        padding: 12px 16px;
+                    }
+                    
+                    /* Make table scrollable on mobile */
+                    .table-container {
+                        overflow-x: auto;
+                        -webkit-overflow-scrolling: touch;
+                    }
+
+                    .pagination-container {
+                        flex-direction: column;
+                        gap: 16px;
                     }
                 }
                 `}

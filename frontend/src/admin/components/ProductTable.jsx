@@ -42,7 +42,7 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
             return product.image;
         }
         // Return default placeholder
-        return 'https://via.placeholder.com/300x300?text=No+Image';
+        return 'https://placehold.co/300x300?text=No+Image';
     };
 
     // Apply advanced filters
@@ -177,10 +177,20 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
         window.URL.revokeObjectURL(url);
     };
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // Container Styles
     const containerStyle = {
         width: '100%',
-        maxWidth: 'calc(100vw - 360px)', // Account for sidebar width
+        maxWidth: isMobile ? '100%' : 'calc(100vw - 300px)', // Account for sidebar width
         backgroundColor: 'white',
         borderRadius: '20px',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
@@ -483,7 +493,7 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                                             onError={(e) => {
-                                                e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                                                e.target.src = 'https://placehold.co/300x300?text=No+Image';
                                             }}
                                         />
                                         {product.onSale && (
@@ -742,7 +752,7 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             onError={(e) => {
-                                e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                                e.target.src = 'https://placehold.co/300x300?text=No+Image';
                             }}
                         />
                         <div style={{
@@ -1151,8 +1161,8 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                         }}
                     >
                         <option value="all">All Categories</option>
-                        {categories.filter(cat => cat !== 'all').map(category => (
-                            <option key={category} value={category}>{category}</option>
+                        {categories.filter(cat => cat !== 'all' && cat).map((category, index) => (
+                            <option key={category || index} value={category}>{category}</option>
                         ))}
                     </select>
                 </div>

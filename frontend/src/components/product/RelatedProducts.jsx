@@ -43,7 +43,7 @@ const RelatedProducts = ({ category, products }) => {
         }
 
         // Fallback to default image
-        return 'https://via.placeholder.com/400x400?text=No+Image';
+        return 'https://placehold.co/400x400?text=No+Image';
     };
 
     // Helper function to get images array

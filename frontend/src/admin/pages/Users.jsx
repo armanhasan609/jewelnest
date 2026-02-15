@@ -17,6 +17,7 @@ const Users = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
     const [stats, setStats] = useState({ total: 0, admins: 0, active: 0, restricted: 0 });
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const token = localStorage.getItem('token');
@@ -25,6 +26,12 @@ const Users = () => {
 
     const [editModal, setEditModal] = useState(false);
     const [currentUser, setCurrentUser] = useState({ _id: '', name: '', role: '' });
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -300,8 +307,99 @@ const Users = () => {
     );
 
     return (
-        <div style={containerStyle}>
+        <div className="page-container">
             <style>{`
+                .page-container {
+                    padding: 32px;
+                    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                    min-height: 100vh;
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                }
+
+                .header-container {
+                     display: flex;
+                     justify-content: space-between;
+                     align-items: center;
+                     margin-bottom: 32px;
+                     flex-wrap: wrap;
+                     gap: 24px;
+                }
+
+                .stats-grid {
+                     display: grid;
+                     grid-template-columns: repeat(4, 1fr);
+                     gap: 20px;
+                     margin-bottom: 32px;
+                }
+
+                .search-container {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    flex-wrap: wrap;
+                }
+
+                .table-container {
+                     overflow-x: auto;
+                     border-radius: 12px;
+                }
+                
+                .user-table {
+                     width: 100%;
+                     border-collapse: collapse;
+                     min-width: 800px;
+                }
+
+                .table-header {
+                    padding: 16px 20px;
+                    text-align: left;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    background-color: #f8fafc;
+                    border-bottom: 2px solid #e2e8f0;
+                }
+
+                .table-cell {
+                    padding: 20px;
+                    border-bottom: 1px solid #f1f5f9;
+                    vertical-align: middle;
+                }
+
+                @media (max-width: 1024px) {
+                    .stats-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .page-container {
+                         padding: 16px;
+                    }
+
+                    .header-container {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 16px;
+                    }
+
+                    .search-container {
+                        flex-direction: column;
+                        align-items: stretch;
+                        width: 100%;
+                    }
+
+                    .stats-grid {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .table-header, .table-cell {
+                         padding: 12px 16px;
+                    }
+                }
+
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
@@ -671,11 +769,11 @@ const Users = () => {
                 </div>
             )}
 
-            <div style={headerStyle}>
+            <div className="header-container">
                 <div>
                     <h1 style={titleStyle}>User Management Dashboard</h1>
                     <p style={{
-                        fontSize: '15px',
+                        fontSize: isMobile ? '13px' : '15px',
                         color: '#64748b',
                         marginTop: '8px',
                         maxWidth: '600px'
@@ -689,6 +787,8 @@ const Users = () => {
                     disabled={loading}
                     style={{
                         padding: '12px 24px',
+                        width: isMobile ? '100%' : 'auto',
+                        justifyContent: 'center',
                         borderRadius: '12px',
                         border: '1px solid #e2e8f0',
                         background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -720,12 +820,7 @@ const Users = () => {
             </div>
 
             {/* Stats Cards */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(1, 1fr)',
-                gap: '20px',
-                marginBottom: '32px'
-            }}>
+            <div className="stats-grid">
                 {[
                     { label: 'Total Users', value: stats.total, color: '#3b82f6', icon: <UsersIcon size={24} />, description: 'All registered accounts' },
                     { label: 'Admins', value: stats.admins, color: '#8b5cf6', icon: <Shield size={24} />, description: 'Administrative accounts' },
@@ -740,12 +835,16 @@ const Users = () => {
                             animation: `slideIn 0.5s ease ${index * 0.1}s both`
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-6px)';
-                            e.currentTarget.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.12)';
+                            if (!isMobile) {
+                                e.currentTarget.style.transform = 'translateY(-6px)';
+                                e.currentTarget.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.12)';
+                            }
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.06)';
+                            if (!isMobile) {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.06)';
+                            }
                         }}
                     >
                         <div style={{
@@ -795,20 +894,16 @@ const Users = () => {
             {/* Search and Filter */}
             <div style={{
                 ...cardStyle,
+                padding: isMobile ? '16px' : '24px',
                 marginBottom: '24px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px'
             }}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    flexWrap: 'wrap'
-                }}>
+                <div className="search-container">
                     <div style={{
                         flex: 1,
-                        minWidth: '300px',
+                        minWidth: isMobile ? '100%' : '300px',
                         position: 'relative'
                     }}>
                         <Search style={{
@@ -847,9 +942,10 @@ const Users = () => {
                     <div style={{
                         display: 'flex',
                         gap: '12px',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        width: isMobile ? '100%' : 'auto'
                     }}>
-                        <Filter size={18} color="#64748b" />
+                        <Filter size={18} color="#64748b" style={{ display: isMobile ? 'none' : 'block' }} />
                         <select
                             value={roleFilter}
                             onChange={(e) => setRoleFilter(e.target.value)}
@@ -862,6 +958,7 @@ const Users = () => {
                                 backgroundColor: 'white',
                                 cursor: 'pointer',
                                 minWidth: '150px',
+                                width: isMobile ? '100%' : 'auto',
                                 transition: 'all 0.3s ease'
                             }}
                             onFocus={(e) => {
@@ -915,65 +1012,18 @@ const Users = () => {
                         </div>
                     </div>
 
-                    <div style={{
-                        overflowX: 'auto',
-                        borderRadius: '12px'
-                    }}>
-                        <table style={{
-                            width: '100%',
-                            borderCollapse: 'collapse',
-                            minWidth: '800px'
-                        }}>
+                    <div className="table-container">
+                        <table className="user-table">
                             <thead>
                                 <tr style={{
                                     backgroundColor: '#f8fafc',
                                     borderBottom: '2px solid #e2e8f0'
                                 }}>
-                                    <th style={{
-                                        padding: '16px 20px',
-                                        textAlign: 'left',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        color: '#6b7280',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em'
-                                    }}>User</th>
-                                    <th style={{
-                                        padding: '16px 20px',
-                                        textAlign: 'left',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        color: '#6b7280',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em'
-                                    }}>Role</th>
-                                    <th style={{
-                                        padding: '16px 20px',
-                                        textAlign: 'left',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        color: '#6b7280',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em'
-                                    }}>Status</th>
-                                    <th style={{
-                                        padding: '16px 20px',
-                                        textAlign: 'left',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        color: '#6b7280',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em'
-                                    }}>Joined</th>
-                                    <th style={{
-                                        padding: '16px 20px',
-                                        textAlign: 'center',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        color: '#6b7280',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em'
-                                    }}>Actions</th>
+                                    <th className="table-header">User</th>
+                                    <th className="table-header">Role</th>
+                                    <th className="table-header">Status</th>
+                                    <th className="table-header">Joined</th>
+                                    <th className="table-header" style={{ textAlign: 'center' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -999,7 +1049,7 @@ const Users = () => {
                                                 e.currentTarget.style.backgroundColor = 'transparent';
                                             }}
                                         >
-                                            <td style={{ padding: '20px' }}>
+                                            <td className="table-cell">
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                     <div style={{
                                                         width: '48px',
@@ -1063,7 +1113,7 @@ const Users = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '20px' }}>
+                                            <td className="table-cell">
                                                 <div style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -1080,7 +1130,7 @@ const Users = () => {
                                                     {user.role.toUpperCase()}
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '20px' }}>
+                                            <td className="table-cell">
                                                 <div style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -1097,10 +1147,10 @@ const Users = () => {
                                                     {isRestricted ? 'Restricted' : 'Active'}
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '20px', fontSize: '14px', color: '#64748b' }}>
+                                            <td className="table-cell" style={{ fontSize: '14px', color: '#64748b' }}>
                                                 {formatDate(user.createdAt)}
                                             </td>
-                                            <td style={{ padding: '20px', textAlign: 'center' }}>
+                                            <td className="table-cell">
                                                 <div style={{
                                                     display: 'flex',
                                                     justifyContent: 'center',

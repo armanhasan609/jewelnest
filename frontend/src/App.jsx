@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ShopContext } from "./context/ShopContext";
 
 // Components & Pages
+import ScrollToTop from "./components/ScrollToTop"; // Import ScrollToTop
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Sidebar from "./admin/components/AdminSidebar";
@@ -25,7 +26,6 @@ import PlaceOrder from "./pages/PlaceOrder";
 import EditProduct from './admin/pages/EditProduct';
 import Dashboard from "./admin/pages/Dashboard";
 import AddProduct from "./admin/pages/AddProduct";
-import Analytics from './admin/pages/Analytics';
 import Users from './admin/pages/Users';
 import AdminOrders from "./admin/pages/Orders"; // Admin side orders
 import OrderDetails from "./admin/pages/OrderDetails"; // Import OrderDetails
@@ -40,6 +40,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fafafa]">
+      <ScrollToTop /> {/* Scroll to top on route change */}
       <ToastContainer position="top-right" autoClose={3000} />
 
       {!isAdminAuthenticated && <Navbar />}
@@ -74,7 +75,6 @@ function App() {
             <Route path="/admin/add-product" element={<ProtectedRoute roleRequired="admin"><AddProduct /></ProtectedRoute>} />
             <Route path="/admin/orders" element={<ProtectedRoute roleRequired="admin"><AdminOrders /></ProtectedRoute>} />
             <Route path="/admin/order-details/:orderId" element={<ProtectedRoute roleRequired="admin"><OrderDetails /></ProtectedRoute>} />
-            <Route path='/admin/analytics' element={<ProtectedRoute roleRequired="admin"><Analytics /></ProtectedRoute>} />
             <Route path='/admin/users' element={<ProtectedRoute roleRequired="admin"><Users /></ProtectedRoute>} />
             <Route path='/admin/edit/:id' element={<ProtectedRoute roleRequired="admin"><EditProduct /></ProtectedRoute>} />
             <Route path='/admin/inquiries' element={<ProtectedRoute roleRequired="admin"><Inquiries /></ProtectedRoute>} />

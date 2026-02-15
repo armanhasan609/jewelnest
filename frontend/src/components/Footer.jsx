@@ -3,10 +3,11 @@ import {
     Mail, Phone, MapPin, Heart, Gem, Shield, Truck,
     CreditCard, Headphones, Clock, Award, ChevronRight
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 const Footer = () => {
+    const navigate = useNavigate();
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [isHovered, setIsHovered] = useState({});
     const [currentYear] = useState(new Date().getFullYear());
@@ -165,7 +166,7 @@ const Footer = () => {
                         alignItems: 'center',
                         justifyContent: isMobile ? 'center' : 'flex-end'
                     }}>
-                        <button style={{
+                        <button onClick={() => navigate('/collection')} style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '12px',
