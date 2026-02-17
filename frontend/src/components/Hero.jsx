@@ -218,7 +218,7 @@ const Hero = () => {
                     flexWrap: 'wrap' // Allow wrapping on very small screens
                 }}>
                     <Sparkles size={18} style={{ flexShrink: 0 }} />
-                    <span>EST. 1892 • LEGACY COLLECTION</span>
+                    <span>EST. 2002 • LEGACY COLLECTION</span>
                 </div>
 
                 {/* Main headline */}
@@ -388,7 +388,6 @@ const Hero = () => {
                     {[
                         { value: '130+', label: 'Years of Excellence' },
                         { value: '5,000+', label: 'Masterpieces Created' },
-                        { value: '48', label: 'International Awards' },
                         { value: '∞', label: 'Stories Told' }
                     ].map((stat, index) => (
                         <div

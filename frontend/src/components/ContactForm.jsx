@@ -541,7 +541,7 @@ const ContactForm = () => {
                         </svg>
                     </div>
                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>Visit Us</div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>Jewelry Street, Mumbai</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>JewelNest, Banipur, Murshidabad</div>
                 </div>
 
                 <div>
@@ -560,7 +560,7 @@ const ContactForm = () => {
                         </svg>
                     </div>
                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>Call Us</div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>+91 98765 43210</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>+91 86090 30343</div>
                 </div>
 
                 <div>
@@ -580,7 +580,7 @@ const ContactForm = () => {
                         </svg>
                     </div>
                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>Email Us</div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>support@jewelrystore.com</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>jewelnest86@gmail.com</div>
                 </div>
             </div>
 

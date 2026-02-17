@@ -23,6 +23,8 @@ import DeliveryLogin from "./pages/DeliveryLogin";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import PlaceOrder from "./pages/PlaceOrder";
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import EditProduct from './admin/pages/EditProduct';
 import Dashboard from "./admin/pages/Dashboard";
 import AddProduct from "./admin/pages/AddProduct";
@@ -64,6 +66,8 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path='/contact' element={<Contact />} />
+            <Route path='/terms' element={<TermsOfService />} />
+            <Route path='/privacy' element={<PrivacyPolicy />} />
 
             {/* ---------- USER PROTECTED ROUTES ---------- */}
             <Route path='/orders' element={<ProtectedRoute><Orders /></ProtectedRoute>} />

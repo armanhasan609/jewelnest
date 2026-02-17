@@ -9,6 +9,8 @@ import Cart from '../pages/Cart';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import PlaceOrder from '../pages/PlaceOrder';
+import TermsOfService from '../pages/TermsOfService';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
 
 // Admin Pages
 import Dashboard from '../admin/pages/Dashboard';
@@ -27,6 +29,8 @@ const AppRoutes = () => {
             <Route path="/product/:productId" element={<Product />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
 
             {/* ---------- USER PROTECTED ROUTES (Sirf logged-in users ke liye) ---------- */}
             <Route path="/cart" element={<Cart />} />

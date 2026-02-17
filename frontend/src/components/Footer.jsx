@@ -38,22 +38,10 @@ const Footer = () => {
             color: '#b8860b'
         },
         {
-            icon: <CreditCard size={24} />,
-            title: 'Easy Returns',
-            sub: '7-Day Return Policy',
-            color: '#ec4899'
-        },
-        {
             icon: <Headphones size={24} />,
             title: '24/7 Support',
             sub: 'Dedicated Assistance',
             color: '#06b6d4'
-        },
-        {
-            icon: <Award size={24} />,
-            title: 'Certified',
-            sub: 'BIS Hallmarked',
-            color: '#f59e0b'
         }
     ];
 
@@ -197,9 +185,10 @@ const Footer = () => {
 
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, 1fr)',
+                    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
                     gap: '20px',
-                    marginTop: '40px'
+                    marginTop: '40px',
+                    alignItems: 'center'
                 }}>
                     {trustBadges.map((badge, index) => (
                         <div
@@ -213,7 +202,12 @@ const Footer = () => {
                                 border: '2px solid transparent',
                                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
                                 position: 'relative',
-                                overflow: 'hidden'
+                                overflow: 'hidden',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '100%'
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-8px)';
