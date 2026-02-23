@@ -51,7 +51,12 @@ app.use(cors({
 }));
 
 // Yeh lines 'userId' undefined wale error ko fix karengi
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({
+    limit: '10mb',
+    verify: (req, res, buf) => {
+        req.rawBody = buf.toString();
+    }
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 4. API Endpoints

@@ -543,7 +543,13 @@ const createRazorpayOrder = async (req, res) => {
         const options = {
             amount: Math.round(Number(amount) * 100),
             currency: 'INR',
-            receipt: orderId ? `order_${orderId}` : `order_${Date.now()}`
+            receipt: orderId ? `order_${orderId}` : `order_${Date.now()}`,
+            notes: {
+                orderId: orderId || ''
+            },
+            notes: {
+                orderId: orderId || ''
+            }
         };
 
         const rpOrder = await razorpay.orders.create(options);
@@ -763,6 +769,78 @@ const cancelOrder = async (req, res) => {
     }
 };
 
+// 11. WEBHOOK HANDLER
+const handleWebhook = async (req, res) => {
+    try {
+        const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+        // Verify signature using raw body
+        const shasum = crypto.createHmac('sha256', secret);
+        shasum.update(req.rawBody); // Make sure req.rawBody is available
+        const digest = shasum.digest('hex');
+
+        if (digest !== req.headers['x-razorpay-signature']) {
+            return res.status(400).json({ status: 'failure', message: 'Signature mismatch' });
+        }
+
+        const event = req.body.event;
+        const payload = req.body.payload;
+
+        if (event === 'payment.captured' || event === 'order.paid') {
+            const payment = payload.payment.entity;
+            const orderId = payment.notes.orderId;
+
+            if (orderId) {
+                const order = await Order.findById(orderId);
+                if (order) {
+                    // Check if already paid to avoid duplicate updates
+                    if (!order.payment) {
+                        order.payment = true;
+                        // Update status to Order Placed if it was Pending Payment or Payment Failed
+                        if (order.status === 'Pending Payment' || order.status === 'Payment Failed') {
+                            order.status = 'Order Placed';
+                        }
+
+                        // Preserve existing payment details or merge
+                        order.paymentDetails = {
+                            ...(order.paymentDetails || {}),
+                            orderId: payment.order_id,
+                            paymentId: payment.id,
+                            signature: req.headers['x-razorpay-signature'], // Store webhook signature
+                            status: 'paid'
+                        };
+                        await order.save();
+                    }
+                }
+            }
+        } else if (event === 'payment.failed') {
+            const payment = payload.payment.entity;
+            const orderId = payment.notes.orderId;
+            if (orderId) {
+                const order = await Order.findById(orderId);
+                // Only log failure, do not update status to 'Payment Failed' to allow retries
+                if (order && !order.payment) {
+                    console.log(`Payment failed for Order ${orderId}: ${payment.id}`);
+                    // Optional: Store failure info without changing main status
+                    order.paymentDetails = {
+                        ...(order.paymentDetails || {}),
+                        lastFailedPaymentId: payment.id,
+                        status: 'pending_retry', // internal status tracking
+                        failedAt: new Date()
+                    };
+                    await order.save();
+                }
+            }
+        }
+
+        res.json({ status: 'ok' });
+
+    } catch (error) {
+        console.error("Webhook Error:", error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
 module.exports = {
     createOrder,
     userOrders,
@@ -774,5 +852,6 @@ module.exports = {
     verifyRazorpayPayment,
     sendOTP,
     verifyDeliveryOTP,
-    cancelOrder
+    cancelOrder,
+    handleWebhook
 };

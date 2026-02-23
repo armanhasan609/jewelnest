@@ -13,7 +13,8 @@ const {
     verifyRazorpayPayment,
     sendOTP,
     cancelOrder,
-    verifyDeliveryOTP
+    verifyDeliveryOTP,
+    handleWebhook
 } = require('../controllers/orderController');
 
 const authUser = require('../middleware/auth');
@@ -26,6 +27,9 @@ router.get('/details/:orderId', authUser, getOrderDetails);
 router.post('/razorpay/create', authUser, createRazorpayOrder);
 router.post('/razorpay/verify', authUser, verifyRazorpayPayment);
 router.post('/cancel', authUser, cancelOrder);
+
+// WEBHOOK
+router.post('/webhook', handleWebhook);
 
 // ADMIN ROUTES
 router.get('/list', adminAuth, getAllOrders);

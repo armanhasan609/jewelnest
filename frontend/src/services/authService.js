@@ -20,7 +20,11 @@ export const registerUser = async (userData) => {
         console.log('Registration successful:', response.data);
         return response.data;
     } catch (error) {
-        console.error("Registration Error:", error.response?.data || error.message);
+        // Return structured error response instead of throwing to let UI handle it gracefully
+        if (error.response && error.response.data) {
+            return error.response.data;
+        }
+        console.error("Registration Error:", error.message);
         throw error;
     }
 };
