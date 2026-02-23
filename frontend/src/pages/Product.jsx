@@ -15,6 +15,7 @@ const Product = () => {
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(0);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [isImageZoomed, setIsImageZoomed] = useState(false);
 
     // Reviews state
     const [reviews, setReviews] = useState([]);
@@ -326,8 +327,10 @@ const Product = () => {
                                 className="product-main-img"
                                 style={{
                                     objectFit: 'cover',
-                                    transition: 'transform 0.3s ease'
+                                    transition: 'transform 0.3s ease',
+                                    cursor: 'zoom-in'
                                 }}
+                                onClick={() => setIsImageZoomed(true)}
                                 onMouseEnter={(e) => {
                                     e.target.style.transform = 'scale(1.05)';
                                 }}
@@ -718,8 +721,7 @@ const Product = () => {
                                 {[
                                     { icon: Gem, label: 'Premium Quality', desc: '100% Authentic Materials' },
                                     { icon: Shield, label: 'Secure Payment', desc: 'SSL Encrypted Checkout' },
-                                    { icon: Truck, label: 'Free Shipping', desc: '3-5 Business Days' },
-                                    { icon: Clock, label: 'Easy Returns', desc: '30 Day Return Policy' }
+                                    { icon: Truck, label: 'Free Shipping', desc: '3-5 Business Days' }
                                 ].map((feature, index) => (
                                     <div key={index} style={{
                                         display: 'flex',
@@ -803,7 +805,7 @@ const Product = () => {
                                         textTransform: 'uppercase',
                                         letterSpacing: '1px'
                                     }}>
-                                        Material
+                                        Sub Category
                                     </p>
                                     <p style={{
                                         fontSize: '14px',
@@ -811,26 +813,7 @@ const Product = () => {
                                         color: '#1a202c',
                                         margin: 0
                                     }}>
-                                        {productData.material || '18K Gold'}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p style={{
-                                        fontSize: '12px',
-                                        color: '#6b7280',
-                                        margin: '0 0 4px 0',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '1px'
-                                    }}>
-                                        Category
-                                    </p>
-                                    <p style={{
-                                        fontSize: '14px',
-                                        fontWeight: '600',
-                                        color: '#1a202c',
-                                        margin: 0
-                                    }}>
-                                        {productData.category || 'Necklace'}
+                                        {productData.subCategory || 'Necklace'}
                                     </p>
                                 </div>
                             </div>
@@ -840,7 +823,7 @@ const Product = () => {
 
                 {/* Related Products */}
                 <RelatedProducts
-                    category={productData.category}
+                    category={productData.subCategory}
                     products={products}
                     currentProductId={productData._id}
                 />
@@ -936,6 +919,64 @@ const Product = () => {
 
             </div>
 
+            {/* Image Zoom Modal */}
+            {isImageZoomed && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        zIndex: 9999,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'zoom-out',
+                        animation: 'fadeIn 0.3s ease'
+                    }}
+                    onClick={() => setIsImageZoomed(false)}
+                >
+                    <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+                        <img
+                            src={productImages[selectedImage] || productImages[0]}
+                            alt={productData.name}
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '90vh',
+                                objectFit: 'contain',
+                                borderRadius: '8px',
+                                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                                cursor: 'default'
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                        <button
+                            onClick={() => setIsImageZoomed(false)}
+                            style={{
+                                position: 'absolute',
+                                top: '-40px',
+                                right: '-40px',
+                                background: 'transparent',
+                                border: 'none',
+                                color: 'white',
+                                cursor: 'pointer',
+                                padding: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* CSS Animations */}
             <style>{`
                 /* Main Grid Layout */
@@ -1010,6 +1051,11 @@ const Product = () => {
                         transform: translateY(0);
                         opacity: 1;
                     }
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
                 }
 
                 @keyframes spin {

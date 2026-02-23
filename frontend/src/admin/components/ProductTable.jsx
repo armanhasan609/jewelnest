@@ -27,8 +27,8 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
 
-    // Get unique categories for filter
-    const categories = ['all', ...new Set(products.map(p => p.category))];
+    // Get unique subCategories for filter
+    const subCategories = ['all', ...new Set(products.map(p => p.subCategory))];
 
     // Helper function to get product image
     const getProductImage = (product) => {
@@ -51,11 +51,11 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
             // Basic search filter
             const matchesSearch = searchTerm === '' ||
                 product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (product.subCategory && product.subCategory.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 product.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
             // Category filter
-            const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+            const matchesCategory = selectedCategory === 'all' || product.subCategory === selectedCategory;
 
             // Advanced filters
             const matchesMinPrice = !advancedFilters.minPrice || product.price >= Number(advancedFilters.minPrice);
@@ -85,7 +85,7 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
             let aValue = a[sortBy];
             let bValue = b[sortBy];
 
-            if (sortBy === 'name' || sortBy === 'category') {
+            if (sortBy === 'name' || sortBy === 'subCategory') {
                 aValue = (aValue || '').toLowerCase();
                 bValue = (bValue || '').toLowerCase();
             }
@@ -151,10 +151,10 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
 
     // Export to CSV
     const exportToCSV = () => {
-        const headers = ['Name', 'Category', 'Price', 'Stock', 'Status', 'Bestseller', 'On Sale', 'SKU'];
+        const headers = ['Name', 'Sub Category', 'Price', 'Stock', 'Status', 'Bestseller', 'On Sale', 'SKU'];
         const csvData = sortedProducts.map(product => [
             product.name,
-            product.category,
+            product.subCategory,
             product.price,
             product.stock,
             product.stock > 0 ? 'In Stock' : 'Out of Stock',
@@ -395,7 +395,7 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                         </th>
                         {[
                             { key: 'name', label: 'Product', width: '35%' },
-                            { key: 'category', label: 'Category', width: '15%' },
+                            { key: 'subCategory', label: 'Sub Category', width: '15%' },
                             { key: 'price', label: 'Price', width: '15%' },
                             { key: 'stock', label: 'Status', width: '15%' },
                             { key: 'actions', label: 'Actions', width: '20%' }
@@ -559,9 +559,9 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                                 </div>
                             </td>
 
-                            {/* Category */}
+                            {/* Sub Category */}
                             <td style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
-                                <CategoryBadge category={product.category} />
+                                <CategoryBadge category={product.subCategory} />
                             </td>
 
                             {/* Price */}
@@ -820,7 +820,7 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <CategoryBadge category={product.category} />
+                            <CategoryBadge category={product.subCategory} />
                             <StockIndicator stock={product.stock} />
                         </div>
 
@@ -1118,6 +1118,7 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             style={{
                                 width: '100%',
+                                boxSizing: 'border-box',
                                 padding: '12px 16px 12px 44px',
                                 border: '2px solid #e2e8f0',
                                 borderRadius: '10px',
@@ -1142,6 +1143,7 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         style={{
                             padding: '12px 16px',
+                            boxSizing: 'border-box',
                             border: '2px solid #e2e8f0',
                             borderRadius: '10px',
                             fontSize: '14px',
@@ -1160,8 +1162,8 @@ const ProductTable = ({ products, onDelete, onEdit, onBulkDelete }) => {
                             e.target.style.boxShadow = 'none';
                         }}
                     >
-                        <option value="all">All Categories</option>
-                        {categories.filter(cat => cat !== 'all' && cat).map((category, index) => (
+                        <option value="all">All Sub Categories</option>
+                        {subCategories.filter(cat => cat !== 'all' && cat).map((category, index) => (
                             <option key={category || index} value={category}>{category}</option>
                         ))}
                     </select>

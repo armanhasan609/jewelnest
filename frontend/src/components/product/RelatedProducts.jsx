@@ -79,7 +79,7 @@ const RelatedProducts = ({ category, products }) => {
         if (products?.length) {
             // Filter by category and ensure we get high-quality related items
             const relatedProducts = products
-                .filter(item => item.category === category)
+                .filter(item => item.subCategory === category)
                 .map(item => ({
                     ...item,
                     // Ensure we have proper image handling

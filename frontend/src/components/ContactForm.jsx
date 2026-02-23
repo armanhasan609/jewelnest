@@ -172,6 +172,8 @@ const ContactForm = () => {
     // Container styles
     const containerStyle = {
         maxWidth: '500px',
+        width: '100%',
+        boxSizing: 'border-box',
         margin: '0 auto',
         padding: 'clamp(30px, 5vw, 50px)',
         background: 'linear-gradient(145deg, #ffffff, #f8fafc)',
@@ -208,6 +210,7 @@ const ContactForm = () => {
 
     const inputStyle = (fieldName, hasError) => ({
         width: '100%',
+        boxSizing: 'border-box',
         padding: 'clamp(14px, 2vw, 16px) clamp(16px, 2.5vw, 20px)',
         background: 'linear-gradient(145deg, #f8fafc, #ffffff)',
         border: `2px solid ${hasError ? '#ef4444' : (focusedField === fieldName ? '#667eea' : '#e2e8f0')}`,

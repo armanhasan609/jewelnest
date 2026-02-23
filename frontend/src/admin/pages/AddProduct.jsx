@@ -445,6 +445,7 @@ const AddProduct = () => {
                                 required
                                 style={{
                                     width: '100%',
+                                    boxSizing: 'border-box',
                                     border: '2px solid #e2e8f0',
                                     padding: '0.875rem 1rem',
                                     borderRadius: '16px',
@@ -478,6 +479,7 @@ const AddProduct = () => {
                             required
                             style={{
                                 width: '100%',
+                                boxSizing: 'border-box',
                                 border: '2px solid #e2e8f0',
                                 padding: '0.875rem 1rem',
                                 borderRadius: '16px',
@@ -743,6 +745,7 @@ const AddProduct = () => {
                                 step="0.01"
                                 style={{
                                     width: '100%',
+                                    boxSizing: 'border-box',
                                     padding: '0.875rem 1rem',
                                     borderRadius: '12px',
                                     border: '2px solid #fbbf24',
@@ -774,6 +777,7 @@ const AddProduct = () => {
                                 step="0.01"
                                 style={{
                                     width: '100%',
+                                    boxSizing: 'border-box',
                                     padding: '0.875rem 1rem',
                                     borderRadius: '12px',
                                     border: '2px solid #fbbf24',
@@ -808,6 +812,7 @@ const AddProduct = () => {
                                 step="1"
                                 style={{
                                     width: '100%',
+                                    boxSizing: 'border-box',
                                     padding: '0.875rem 1rem',
                                     borderRadius: '12px',
                                     border: '2px solid #fbbf24',
@@ -948,6 +953,7 @@ const AddProduct = () => {
                                         step="0.01"
                                         style={{
                                             width: '100%',
+                                            boxSizing: 'border-box',
                                             padding: '0.875rem 1rem',
                                             borderRadius: '12px',
                                             border: '2px solid #10b981',
@@ -980,6 +986,7 @@ const AddProduct = () => {
                                         required={onSale}
                                         style={{
                                             width: '100%',
+                                            boxSizing: 'border-box',
                                             padding: '0.875rem 1rem',
                                             borderRadius: '12px',
                                             border: '2px solid #10b981',
@@ -1013,6 +1020,7 @@ const AddProduct = () => {
                                         required={onSale}
                                         style={{
                                             width: '100%',
+                                            boxSizing: 'border-box',
                                             padding: '0.875rem 1rem',
                                             borderRadius: '12px',
                                             border: '2px solid #10b981',
@@ -1058,6 +1066,7 @@ const AddProduct = () => {
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                     style={{
                                         padding: '0.75rem 1rem',
+                                        boxSizing: 'border-box',
                                         border: '2px solid #e2e8f0',
                                         borderRadius: '16px',
                                         backgroundColor: 'white',
@@ -1168,6 +1177,7 @@ const AddProduct = () => {
                                                         autoFocus
                                                         style={{
                                                             width: '100%',
+                                                            boxSizing: 'border-box',
                                                             padding: '0.5rem',
                                                             border: '1px solid #3b82f6',
                                                             borderRadius: '8px',

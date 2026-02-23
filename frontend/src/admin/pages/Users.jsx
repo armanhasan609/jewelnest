@@ -920,6 +920,7 @@ const Users = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             style={{
                                 width: '100%',
+                                boxSizing: 'border-box',
                                 padding: '14px 20px 14px 48px',
                                 border: '2px solid #e2e8f0',
                                 borderRadius: '12px',
@@ -951,6 +952,7 @@ const Users = () => {
                             onChange={(e) => setRoleFilter(e.target.value)}
                             style={{
                                 padding: '12px 20px',
+                                boxSizing: 'border-box',
                                 border: '2px solid #e2e8f0',
                                 borderRadius: '12px',
                                 fontSize: '14px',
