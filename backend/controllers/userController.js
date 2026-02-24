@@ -152,13 +152,10 @@ const registerUser = async (req, res) => {
         }
 
         // Check if user already exists
-        const existingUser = await userModel.findOne({ $or: [{ email }, { phoneNumber }] });
+        const existingUser = await userModel.findOne({ $or: [{ email }] });
         if (existingUser) {
             if (existingUser.email === email) {
                 return res.status(409).json({ success: false, message: "User already exists with this email" });
-            }
-            if (existingUser.phoneNumber === phoneNumber) {
-                return res.status(409).json({ success: false, message: "User already exists with this phone number" });
             }
         }
 
@@ -221,9 +218,7 @@ const registerUser = async (req, res) => {
             const field = Object.keys(error.keyPattern)[0];
             const message = field === 'email'
                 ? "User with this email already exists"
-                : field === 'phoneNumber'
-                    ? "User with this phone number already exists"
-                    : `User with this ${field} already exists`;
+                : `User with this ${field} already exists`;
 
             return res.status(409).json({
                 success: false,

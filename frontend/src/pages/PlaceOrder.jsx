@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { CreditCard, Wallet, Smartphone, Lock, CheckCircle, Truck, Shield, Package, Star } from 'lucide-react';
+import { CreditCard, Wallet, Smartphone, Lock, CheckCircle, Truck, Package, Star, Tag, X, Shield } from 'lucide-react';
 
 const PlaceOrder = () => {
     // Scroll to top on component mount
@@ -31,6 +31,13 @@ const PlaceOrder = () => {
     const [reviewProductId, setReviewProductId] = useState(null);
     const [reviewProductIds, setReviewProductIds] = useState([]);
 
+    // Coupon related state
+    const [couponCode, setCouponCode] = useState('');
+    const [couponDiscount, setCouponDiscount] = useState(0);
+    const [couponError, setCouponError] = useState('');
+    const [couponSuccess, setCouponSuccess] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+
     const [formData, setFormData] = useState({
         firstName: '', lastName: '', email: '',
         street: '', city: '', state: '',
@@ -45,7 +52,45 @@ const PlaceOrder = () => {
     const isFreeShipping = cartTotal > FREE_SHIPPING_THRESHOLD;
     const shippingFee = isFreeShipping ? 0 : 50;
 
-    const orderTotal = cartTotal - discount + shippingFee;
+    const orderTotal = Math.max(0, cartTotal - discount - couponDiscount + shippingFee);
+
+    const handleApplyCoupon = async () => {
+        setCouponError('');
+        setCouponSuccess('');
+        if (!couponCode.trim()) {
+            setCouponError('Please enter a coupon code');
+            return;
+        }
+
+        try {
+            const res = await axios.post(
+                `${backendUrl}/api/coupons/validate`,
+                { code: couponCode, orderAmount: cartTotal },
+                { headers: { token } }
+            );
+
+            if (res.data.success) {
+                setCouponDiscount(res.data.discountAmount);
+                setAppliedCoupon({ code: couponCode, discount: res.data.discountAmount });
+                setCouponSuccess(`Coupon applied! You saved ${currency}${res.data.discountAmount}`);
+                setCouponError('');
+            }
+        } catch (err) {
+            console.error(err);
+            setCouponDiscount(0);
+            setAppliedCoupon(null);
+            setCouponSuccess('');
+            setCouponError(err.response?.data?.message || 'Invalid coupon code');
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setCouponCode('');
+        setCouponDiscount(0);
+        setAppliedCoupon(null);
+        setCouponSuccess('');
+        setCouponError('');
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -95,6 +140,11 @@ const PlaceOrder = () => {
     const handlePlaceOrder = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
+
+        if (couponError && couponCode && !appliedCoupon) {
+            toast.error("Please fix coupon error or remove it");
+            return;
+        }
 
         if (!token) {
             toast.error("Please login first");
@@ -159,9 +209,10 @@ const PlaceOrder = () => {
             },
             items: items,
             subtotal: safeSubtotal,
-            discount: safeDiscount,
+            discount: safeDiscount + (Number(couponDiscount) || 0),
             shipping: safeShipping,
             totalAmount: safeTotal,
+            couponCode: appliedCoupon ? appliedCoupon.code : null, // Assuming backend saves this
             paymentMethod: paymentMethod.toUpperCase(),
             paymentStatus: paymentMethod === 'cod' ? 'PENDING' : 'PENDING',
             orderStatus: 'CONFIRMED',
@@ -762,6 +813,69 @@ const PlaceOrder = () => {
                         </h2>
 
                         <div>
+                            {/* Coupon Section */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <div style={{ position: 'relative', flex: 1 }}>
+                                        <Tag size={16} color="#6b7280" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                                        <input
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                            placeholder="Enter coupon code"
+                                            disabled={!!appliedCoupon}
+                                            style={{
+                                                width: '100%',
+                                                padding: '10px 10px 10px 36px',
+                                                boxSizing: 'border-box',
+                                                border: `1px solid ${couponError ? '#ef4444' : '#e5e7eb'}`,
+                                                borderRadius: '6px',
+                                                outline: 'none'
+                                            }}
+                                        />
+                                    </div>
+                                    {appliedCoupon ? (
+                                        <button
+                                            onClick={handleRemoveCoupon}
+                                            style={{
+                                                backgroundColor: '#ef4444',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '6px',
+                                                padding: '0 16px',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            <X size={18} />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleApplyCoupon}
+                                            style={{
+                                                backgroundColor: '#1f2937',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '6px',
+                                                padding: '0 16px',
+                                                cursor: 'pointer',
+                                                fontWeight: '500'
+                                            }}
+                                        >
+                                            Apply
+                                        </button>
+                                    )}
+                                </div>
+                                {couponError && (
+                                    <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                                        {couponError}
+                                    </div>
+                                )}
+                                {couponSuccess && (
+                                    <div style={{ color: '#10b981', fontSize: '12px', marginTop: '4px' }}>
+                                        {couponSuccess}
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="summary-item">
                                 <span className="summary-label">Subtotal ({cartCount} items)</span>
                                 <span className="summary-value">{currency}{cartTotal.toFixed(2)}</span>
@@ -771,6 +885,13 @@ const PlaceOrder = () => {
                                 <div className="summary-item">
                                     <span className="summary-label">Discount (10% off)</span>
                                     <span className="summary-value discount">-{currency}{discount.toFixed(2)}</span>
+                                </div>
+                            )}
+
+                            {couponDiscount > 0 && (
+                                <div className="summary-item">
+                                    <span className="summary-label" style={{ color: '#16a34a' }}>Coupon Applied ({couponCode})</span>
+                                    <span className="summary-value discount" style={{ color: '#16a34a' }}>-{currency}{Number(couponDiscount).toFixed(2)}</span>
                                 </div>
                             )}
 

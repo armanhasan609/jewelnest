@@ -16,6 +16,7 @@ const orderRouter = require('./routes/orderRoutes');
 const contactRouter = require('./routes/contactRoute');
 const reviewsRouter = require('./routes/reviewsRoutes');
 const subCategoryRouter = require('./routes/subCategoryRoutes');
+const couponRouter = require('./routes/couponRoutes');
 
 // 1. Database Connect
 connectDB();
@@ -67,6 +68,7 @@ app.use('/api/orders', orderRouter);
 app.use('/api/contact', contactRouter);
 app.use('/api/reviews', reviewsRouter);
 app.use('/api/subcategories', subCategoryRouter);
+app.use('/api/coupons', couponRouter);
 
 // 5. Health Check
 app.get('/api/health', (req, res) => {

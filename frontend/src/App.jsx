@@ -28,6 +28,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import EditProduct from './admin/pages/EditProduct';
 import Dashboard from "./admin/pages/Dashboard";
 import AddProduct from "./admin/pages/AddProduct";
+import AddCoupon from "./admin/pages/AddCoupon";
 import Users from './admin/pages/Users';
 import AdminOrders from "./admin/pages/Orders"; // Admin side orders
 import OrderDetails from "./admin/pages/OrderDetails"; // Import OrderDetails
@@ -77,6 +78,7 @@ function App() {
             {/* ---------- ADMIN ROUTES ---------- */}
             <Route path="/admin/dashboard" element={<ProtectedRoute roleRequired="admin"><Dashboard /></ProtectedRoute>} />
             <Route path="/admin/add-product" element={<ProtectedRoute roleRequired="admin"><AddProduct /></ProtectedRoute>} />
+            <Route path="/admin/add-coupon" element={<ProtectedRoute roleRequired="admin"><AddCoupon /></ProtectedRoute>} />
             <Route path="/admin/orders" element={<ProtectedRoute roleRequired="admin"><AdminOrders /></ProtectedRoute>} />
             <Route path="/admin/order-details/:orderId" element={<ProtectedRoute roleRequired="admin"><OrderDetails /></ProtectedRoute>} />
             <Route path='/admin/users' element={<ProtectedRoute roleRequired="admin"><Users /></ProtectedRoute>} />

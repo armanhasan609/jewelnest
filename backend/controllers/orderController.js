@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const Coupon = require('../models/Coupon');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
@@ -11,7 +12,7 @@ const razorpay = new Razorpay({
 // 1. PLACE ORDER
 const createOrder = async (req, res) => {
     try {
-        const { items, totalAmount, address, phoneNumber, customerName, email, paymentMethod } = req.body;
+        const { items, totalAmount, address, phoneNumber, customerName, email, paymentMethod, couponCode } = req.body;
         const userId = req.user?._id;
 
         if (!userId) {
@@ -122,6 +123,14 @@ const createOrder = async (req, res) => {
         });
 
         await newOrder.save();
+
+        // Increment Coupon Usage
+        if (couponCode) {
+            await Coupon.findOneAndUpdate(
+                { code: couponCode },
+                { $inc: { usedCount: 1 } }
+            );
+        }
 
         // Send order confirmation email
         await sendOrderConfirmationEmail(email, newOrder);
