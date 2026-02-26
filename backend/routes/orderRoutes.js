@@ -14,7 +14,8 @@ const {
     sendOTP,
     cancelOrder,
     verifyDeliveryOTP,
-    handleWebhook
+    handleWebhook,
+    getPublicOrderDetails
 } = require('../controllers/orderController');
 
 const authUser = require('../middleware/auth');
@@ -39,5 +40,6 @@ router.post('/status', adminAuth, updateOrderStatus);
 
 // PUBLIC ROUTES (for delivery person)
 router.post('/verify-otp', verifyDeliveryOTP);
+router.get('/public/:orderId', getPublicOrderDetails);
 
 module.exports = router;

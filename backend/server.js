@@ -28,7 +28,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Razorpay env sanity check
+
 const missingRazorpayEnv = ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'].filter((k) => !process.env[k]);
 if (missingRazorpayEnv.length) {
     console.warn(`⚠️ Missing Razorpay env vars: ${missingRazorpayEnv.join(', ')}`);
@@ -36,7 +36,7 @@ if (missingRazorpayEnv.length) {
 
 const app = express();
 
-// 3. Middlewares (Order is very important here)
+
 const allowedOrigins = [process.env.FRONTEND_URL, 'http://72.62.228.234', 'http://localhost:5174'].filter(Boolean);
 
 app.use(cors({
@@ -44,7 +44,7 @@ app.use(cors({
         if (!origin || allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
-        return callback(null, true); // Mobile apps ya local testing ke liye friendly rakha hai
+        return callback(null, true);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

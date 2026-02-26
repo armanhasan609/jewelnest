@@ -202,15 +202,15 @@ const Orders = () => {
 
         const itemsHTML = order.items.map(item => `
             <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                <td style="padding: 4px; border-bottom: 1px solid #ddd;">
                     <img src="${item.images?.[0] || item.image || ''}" 
                          alt="${item.name}" 
-                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                         style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
                 </td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.name}</td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
+                <td style="padding: 4px; border-bottom: 1px solid #ddd; font-size: 10px;">${item.name}</td>
+                <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: center; font-size: 10px;">${item.quantity}</td>
+                <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: right; font-size: 10px;">₹${item.price.toLocaleString('en-IN')}</td>
+                <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: right; font-size: 10px;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
             </tr>
         `).join('');
 
@@ -222,9 +222,10 @@ const Orders = () => {
             return [
                 addr.firstName && addr.lastName ? `${addr.firstName} ${addr.lastName}` : '',
                 addr.street,
+                addr.nearbyLocation,
                 addr.city,
                 addr.state,
-                addr.zipcode || addr.zipCode,
+                addr.pincode || addr.zipcode || addr.zipCode,
                 addr.country
             ].filter(Boolean).join(', ');
         };
@@ -237,19 +238,24 @@ const Orders = () => {
             <head>
                 <title>Order Invoice #${order._id.slice(-8)}</title>
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 20px; position: relative; }
+                    @page { size: auto; margin: 5mm; }
+                    body { font-family: Arial, sans-serif; margin: 10px; font-size: 10px; line-height: 1.2; }
+                    .header { text-align: center; margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 10px; position: relative; }
                     .qr-code { position: absolute; right: 0; top: 0; text-align: center; }
-                    .section { margin-bottom: 20px; }
-                    .section-title { background: #f5f5f5; padding: 10px; font-weight: bold; margin-bottom: 10px; }
-                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                    th { background: #f8f9fa; padding: 12px 8px; text-align: left; font-weight: bold; border-bottom: 2px solid #ddd; }
-                    td { padding: 10px 8px; border-bottom: 1px solid #ddd; }
-                    .total-row { font-weight: bold; font-size: 16px; background: #f8f9fa; }
+                    .qr-code img { width: 66px; height: 66px; }
+                    h1 { font-size: 16px; margin: 5px 0; }
+                    h3 { font-size: 12px; margin: 5px 0; }
+                    .section { margin-bottom: 10px; }
+                    .section-title { background: #f5f5f5; padding: 4px; font-weight: bold; margin-bottom: 5px; font-size: 11px; }
+                    p { margin: 2px 0; }
+                    table { width: 100%; border-collapse: collapse; margin: 5px 0; }
+                    th { background: #f8f9fa; padding: 4px; text-align: left; font-weight: bold; border-bottom: 1px solid #ddd; font-size: 10px; }
+                    td { padding: 4px; border-bottom: 1px solid #ddd; font-size: 10px; }
+                    .total-row td { font-weight: bold; font-size: 11px; background: #f8f9fa; }
                     .status-badge { 
-                        padding: 4px 12px; 
-                        border-radius: 20px; 
-                        font-size: 12px; 
+                        padding: 2px 8px; 
+                        border-radius: 10px; 
+                        font-size: 9px; 
                         font-weight: bold;
                         display: inline-block;
                     }
@@ -258,6 +264,7 @@ const Orders = () => {
                     .status-shipped { background: #f3e5f5; color: #7b1fa2; }
                     .status-delivered { background: #e8f5e8; color: #2e7d32; }
                     .status-cancelled { background: #ffebee; color: #c62828; }
+                    .footer-qr { width: 100px; height: 100px; }
                     @media print {
                         .no-print { display: none; }
                         body { margin: 0; }
@@ -268,10 +275,10 @@ const Orders = () => {
             <body>
                 <div class="header">
                     <div class="qr-code">
-                        <img src="${qrCodeUrl}" alt="Delivery QR" style="width: 100px; height: 100px;" />
-                        <div style="font-size: 10px;">Driver Scan</div>
+                        <img src="${qrCodeUrl}" alt="Delivery QR" />
+                        <div style="font-size: 8px;">Driver Scan</div>
                     </div>
-                    <h1>JewelNest - Order Invoice</h1>
+                    <h1>JewelNest Invoice</h1>
                     <h3>Order #${order._id.slice(-8)}</h3>
                     <p>Date: ${order.formattedDate}</p>
                     <div class="status-badge status-${order.status.toLowerCase().replace(' ', '-')}">
@@ -279,12 +286,24 @@ const Orders = () => {
                     </div>
                 </div>
                 
-                <div class="section">
-                    <div class="section-title">Customer Information</div>
-                    <p><strong>Name:</strong> ${order.customerName}</p>
-                    <p><strong>Email:</strong> ${order.email}</p>
-                    <p><strong>Phone:</strong> ${order.phoneNumber}</p>
-                    <p><strong>Address:</strong> ${formattedAddress}</p>
+                <div style="display: flex; gap: 10px; font-size: 10px;">
+                    <div class="section" style="flex: 1;">
+                        <div class="section-title">Sold By</div>
+                        <p><strong>JewelNest</strong></p>
+                        <p>JewelNest, Banipur, Murshidabad<br />
+                                            West Bengal, India - 742235</p>
+                        <p>jewelnest86@gmail.com</p>
+                    </div>
+                    <div class="section" style="flex: 1;">
+                        <div class="section-title">Bill To</div>
+                        <p><strong>Name:</strong> ${order.customerName}</p>
+                        <p><strong>Email:</strong> ${order.email}</p>
+                        <p><strong>Phone:</strong> ${order.phoneNumber}</p>
+                    </div>
+                    <div class="section" style="flex: 1;">
+                        <div class="section-title">Shipping Address</div>
+                        <p>${formattedAddress}</p>
+                    </div>
                 </div>
                 
                 <div class="section">
@@ -292,11 +311,11 @@ const Orders = () => {
                     <table>
                         <thead>
                             <tr>
-                                <th>Image</th>
-                                <th>Product Name</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                                <th>Total</th>
+                                <th style="width: 50px;">Image</th>
+                                <th>Product</th>
+                                <th style="text-align: center;">Qty</th>
+                                <th style="text-align: right;">Price</th>
+                                <th style="text-align: right;">Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -304,38 +323,37 @@ const Orders = () => {
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4" style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">Subtotal:</td>
-                                <td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">₹${subtotal.toLocaleString('en-IN')}</td>
+                                <td colspan="4" style="text-align: right; font-weight: bold;">Subtotal:</td>
+                                <td style="text-align: right;">₹${subtotal.toLocaleString('en-IN')}</td>
                             </tr>
                             <tr>
-                                <td colspan="4" style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">Delivery Charges:</td>
-                                <td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">${deliveryCharge === 0 ? 'Free' : '₹' + deliveryCharge}</td>
+                                <td colspan="4" style="text-align: right; font-weight: bold;">Delivery:</td>
+                                <td style="text-align: right;">${deliveryCharge === 0 ? 'Free' : '₹' + deliveryCharge}</td>
                             </tr>
                             <tr class="total-row">
-                                <td colspan="4" style="text-align: right; padding: 8px;">Grand Total:</td>
-                                <td style="text-align: right; padding: 8px;">₹${total.toLocaleString('en-IN')}</td>
+                                <td colspan="4" style="text-align: right;">Grand Total:</td>
+                                <td style="text-align: right;">₹${total.toLocaleString('en-IN')}</td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
                 
-                <div class="section">
-                    <div class="section-title">Payment Information</div>
-                    <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-                    <p><strong>Payment Status:</strong> ${order.payment ? 'Paid' : 'Pending'}</p>
-                    <p><strong>Total Amount:</strong> ₹${total.toLocaleString('en-IN')}</p>
-                </div>
-
-                <div class="section" style="text-align: center; margin-top: 30px; border-top: 1px dashed #ccc; padding-top: 20px;">
-                    <img src="${qrCodeUrl}" alt="Delivery QR" style="width: 150px; height: 150px;" />
-                    <p><strong>Delivery Verification QR Code</strong></p>
+                <div class="section" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 5px; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div class="section-title" style="display: inline-block; margin: 0;">Payment:</div>
+                        <span style="font-size: 10px;"> ${order.paymentMethod} (${order.payment ? 'Paid' : 'Pending'})</span>
+                    </div>
+                    <div style="text-align: center;">
+                         <img src="${qrCodeUrl}" alt="Delivery QR" class="footer-qr" />
+                         <div style="font-size: 8px;">Delivery Verification</div>
+                    </div>
                 </div>
                 
-                <div class="no-print" style="margin-top: 40px; text-align: center;">
-                    <button onclick="window.print()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Print Invoice
+                <div class="no-print" style="margin-top: 10px; text-align: center;">
+                    <button onclick="window.print()" style="padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        Print
                     </button>
-                    <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                    <button onclick="window.close()" style="padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px; font-size: 12px;">
                         Close
                     </button>
                 </div>

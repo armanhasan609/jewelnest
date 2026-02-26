@@ -16,6 +16,26 @@ const DeliveryLogin = () => {
 
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+    const [preAuthDetails, setPreAuthDetails] = useState(null);
+
+    // Fetch basic customer details on page load
+    React.useEffect(() => {
+        if (orderId) {
+            fetchBasicDetails();
+        }
+    }, [orderId]);
+
+    const fetchBasicDetails = async () => {
+        try {
+            const res = await axios.get(`${BACKEND_URL}/api/orders/public/${orderId}`);
+            if (res.data.success) {
+                setPreAuthDetails(res.data.order);
+            }
+        } catch (err) {
+            console.log("Could not fetch pre-auth details", err);
+        }
+    };
+
     const handleVerify = async (e) => {
         e.preventDefault();
         setMessage('');
@@ -134,6 +154,37 @@ const DeliveryLogin = () => {
                             Order ID: <span style={{ color: '#111827', fontWeight: 600 }}>{orderId || 'N/A'}</span>
                         </div>
 
+                        {preAuthDetails && (
+                            <div style={{
+                                background: '#f0f9ff',
+                                borderRadius: '8px',
+                                padding: '12px',
+                                marginBottom: '20px',
+                                border: '1px solid #bae6fd'
+                            }}>
+                                <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 'bold', color: '#0369a1' }}>
+                                    Deliver To:
+                                </p>
+                                <p style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 'bold', color: '#0c4a6e' }}>
+                                    {preAuthDetails.address?.firstName} {preAuthDetails.address?.lastName}
+                                </p>
+                                <p style={{ margin: '0 0 2px 0', fontSize: '13px', color: '#0c4a6e' }}>
+                                    📞 {preAuthDetails.address?.phone}
+                                </p>
+                                <p style={{ margin: '0', fontSize: '13px', color: '#0c4a6e' }}>
+                                    📧 {preAuthDetails.email}
+                                </p>
+                                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#075985', fontStyle: 'italic' }}>
+                                    📍 {[preAuthDetails.address?.street, preAuthDetails.address?.city, preAuthDetails.address?.state, preAuthDetails.address?.pincode].filter(Boolean).join(', ')}
+                                </p>
+                                {preAuthDetails.address?.nearbyLocation && (
+                                    <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#075985', fontStyle: 'italic' }}>
+                                        📌 Nearby: {preAuthDetails.address.nearbyLocation}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
                         <form onSubmit={handleVerify}>
                             <input
                                 type="text"
@@ -143,6 +194,7 @@ const DeliveryLogin = () => {
                                 style={{
                                     width: '100%',
                                     padding: '12px 14px',
+                                    boxSizing: 'border-box',
                                     borderRadius: '10px',
                                     border: '1px solid #e5e7eb',
                                     marginBottom: '14px',

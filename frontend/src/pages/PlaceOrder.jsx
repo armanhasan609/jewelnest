@@ -40,7 +40,7 @@ const PlaceOrder = () => {
 
     const [formData, setFormData] = useState({
         firstName: '', lastName: '', email: '',
-        street: '', city: '', state: '',
+        street: '', nearbyLocation: '', city: '', state: '',
         phone: '', pincode: ''
     });
 
@@ -203,6 +203,7 @@ const PlaceOrder = () => {
             phoneNumber: formData.phone,
             address: {
                 street: formData.street,
+                nearbyLocation: formData.nearbyLocation,
                 city: formData.city,
                 state: formData.state,
                 pincode: formData.pincode
@@ -728,6 +729,17 @@ const PlaceOrder = () => {
                                             {errors.street}
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Nearby Location */}
+                                <div>
+                                    <input
+                                        name="nearbyLocation"
+                                        onChange={handleInputChange}
+                                        value={formData.nearbyLocation}
+                                        placeholder="Nearby location / landmark (optional)"
+                                        className="form-input"
+                                    />
                                 </div>
 
                                 {/* City and State */}

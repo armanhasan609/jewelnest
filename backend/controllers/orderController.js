@@ -850,6 +850,45 @@ const handleWebhook = async (req, res) => {
     }
 };
 
+// PUBLIC: Get basic order details for delivery login page
+const getPublicOrderDetails = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findById(orderId).select(
+            'address customerName email phoneNumber status'
+        );
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Only return limited info — name, phone, email, city/state/pincode
+        const addr = order.address || {};
+        res.json({
+            success: true,
+            order: {
+                address: {
+                    firstName: addr.firstName || '',
+                    lastName: addr.lastName || '',
+                    phone: addr.phone || order.phoneNumber || '',
+                    street: addr.street || '',
+                    nearbyLocation: addr.nearbyLocation || '',
+                    city: addr.city || '',
+                    state: addr.state || '',
+                    pincode: addr.pincode || addr.zipcode || addr.zipCode || ''
+                },
+                customerName: order.customerName,
+                email: order.email,
+                phoneNumber: order.phoneNumber
+            }
+        });
+    } catch (error) {
+        console.error("Public Order Details Error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 module.exports = {
     createOrder,
     userOrders,
@@ -862,5 +901,6 @@ module.exports = {
     sendOTP,
     verifyDeliveryOTP,
     cancelOrder,
-    handleWebhook
+    handleWebhook,
+    getPublicOrderDetails
 };
