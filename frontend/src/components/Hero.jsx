@@ -386,7 +386,7 @@ const Hero = () => {
                     paddingBottom: '40px' // Space for scroll indicator
                 }}>
                     {[
-                        { value: '130+', label: 'Years of Excellence' },
+                        { value: '24+', label: 'Years of Excellence' },
                         { value: '5,000+', label: 'Masterpieces Created' },
                         { value: '∞', label: 'Stories Told' }
                     ].map((stat, index) => (
