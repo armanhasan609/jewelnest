@@ -350,6 +350,9 @@ const EditProduct = () => {
                 formData.append("image", image); // Same field name for all images
             });
 
+            // Send existing images that user wants to KEEP (removed ones won't be sent)
+            formData.append("existingImages", JSON.stringify(existingImages));
+
             // Sale Logic
             if (onSale) {
                 formData.append("salePrice", Number(salePrice));

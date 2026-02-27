@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const cloudinary = require('cloudinary').v2;
 const connectDB = require('./config/db');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -21,12 +20,7 @@ const couponRouter = require('./routes/couponRoutes');
 // 1. Database Connect
 connectDB();
 
-// 2. Cloudinary Config
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// 2. AWS S3 Config (loaded via config/s3.js and middleware/upload.js)
 
 
 const missingRazorpayEnv = ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'].filter((k) => !process.env[k]);

@@ -64,14 +64,14 @@ const createOrder = async (req, res) => {
                 finalImage = item.images[0];
             }
 
-            // Handle if result is an object (e.g. Cloudinary resource)
+            // Handle if result is an object (e.g. S3 resource)
             if (typeof finalImage === 'object' && finalImage !== null && finalImage.url) {
                 finalImage = finalImage.url;
             }
 
             // 2. Default fallback if still empty
             // if (!finalImage) {
-            //     finalImage = 'https://res.cloudinary.com/demo/image/upload/sample.jpg';
+            //     finalImage = 'https://jewelnestimage.s3.ap-south-1.amazonaws.com/placeholder.jpg';
             // }
 
             // 3. Ensure images is a valid array of strings
@@ -164,7 +164,7 @@ const userOrders = async (req, res) => {
             ...order.toObject(),
             items: order.items.map(item => ({
                 ...item,
-                images: ensureCloudinaryUrls(item.images || []),
+                images: ensureImageUrls(item.images || []),
                 thumbnail: getThumbnailUrl(item.images?.[0] || item.image || ''),
                 price: item.price || 0,
                 total: (item.price || 0) * (item.quantity || 1)
@@ -213,7 +213,7 @@ const getAllOrders = async (req, res) => {
         const formattedOrders = await Promise.all(orders.map(async (order) => {
             const itemsWithImages = order.items.map(item => ({
                 ...item.toObject(),
-                images: ensureCloudinaryUrls(item.images || []),
+                images: ensureImageUrls(item.images || []),
                 thumbnail: getThumbnailUrl(item.images?.[0] || item.image || ''),
                 largeImage: getLargeImageUrl(item.images?.[0] || item.image || ''),
                 itemTotal: (item.price || 0) * (item.quantity || 1)
@@ -286,9 +286,9 @@ const getOrderDetails = async (req, res) => {
 
                 return {
                     ...item.toObject(),
-                    images: ensureCloudinaryUrls(item.images || []),
+                    images: ensureImageUrls(item.images || []),
                     thumbnail: getThumbnailUrl(item.images?.[0] || item.image || ''),
-                    largeImages: ensureCloudinaryUrls(item.images || []).map(url => getLargeImageUrl(url)),
+                    largeImages: ensureImageUrls(item.images || []).map(url => getLargeImageUrl(url)),
                     description: product?.description || '',
                     material: product?.material || '',
                     weight: product?.weight || '',
@@ -299,7 +299,7 @@ const getOrderDetails = async (req, res) => {
             } catch (err) {
                 return {
                     ...item.toObject(),
-                    images: ensureCloudinaryUrls(item.images || []),
+                    images: ensureImageUrls(item.images || []),
                     thumbnail: getThumbnailUrl(item.images?.[0] || item.image || ''),
                     itemTotal: (item.price || 0) * (item.quantity || 1)
                 };
@@ -328,39 +328,26 @@ const getOrderDetails = async (req, res) => {
     }
 };
 
-// Helper functions for Cloudinary URLs
-const ensureCloudinaryUrls = (images) => {
+// Helper functions for image URLs (S3 compatible)
+const ensureImageUrls = (images) => {
     if (!Array.isArray(images)) {
         images = images ? [images] : [];
     }
 
     return images.map(img => {
         if (typeof img !== 'string') return '';
-
-        // If already Cloudinary URL
-        if (img.includes('cloudinary.com')) {
-            return img;
-        }
-
-        // Convert local paths to Cloudinary
-        if (img.startsWith('/uploads/')) {
-            return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload${img}`;
-        }
-
         return img;
     }).filter(img => img);
 };
 
-const getThumbnailUrl = (imageUrl, width = 150, height = 150) => {
-    if (!imageUrl || !imageUrl.includes('cloudinary.com')) return imageUrl;
-
-    return imageUrl.replace('/upload/', `/upload/w_${width},h_${height},c_fill/`);
+const getThumbnailUrl = (imageUrl) => {
+    // S3 images are already resized via sharp during upload
+    return imageUrl || '';
 };
 
-const getLargeImageUrl = (imageUrl, width = 600, height = 600) => {
-    if (!imageUrl || !imageUrl.includes('cloudinary.com')) return imageUrl;
-
-    return imageUrl.replace('/upload/', `/upload/w_${width},h_${height},c_fill/`);
+const getLargeImageUrl = (imageUrl) => {
+    // S3 images are already at good quality via sharp during upload
+    return imageUrl || '';
 };
 
 // Send order confirmation email

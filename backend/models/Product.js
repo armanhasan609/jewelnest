@@ -26,7 +26,6 @@ const ProductSchema = new mongoose.Schema({
             publicId: { type: String, required: true }
         }
     ],
-    cloudinaryPublicId: { type: String },
     // category: { type: String, required: true }, // Removed
     subCategory: { type: String, required: true },
     bestseller: { type: Boolean, default: false }

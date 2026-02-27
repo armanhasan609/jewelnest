@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
-const upload = require('../middleware/upload'); // Multer middleware
+const { upload } = require('../middleware/upload'); // Multer middleware (AWS S3)
 
 // 1. ADD PRODUCT: POST request
 // Frontend se 'image' key mein multiple files aa sakti hain

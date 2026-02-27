@@ -188,7 +188,7 @@ OrderSchema.pre('validate', function (next) {
                         item.image = item.images[0];
                     } else {
                         // If still no image, use a placeholder to pass validation
-                        const placeholder = 'https://res.cloudinary.com/demo/image/upload/sample.jpg';
+                        const placeholder = 'https://jewelnestimage.s3.ap-south-1.amazonaws.com/placeholder.jpg';
                         item.image = placeholder;
                         if (item.images.length === 0) {
                             item.images = [placeholder];
