@@ -173,31 +173,6 @@ const ProductCard = ({ product }) => {
             }}
             onClick={() => navigate(`/product/${product._id || product.id}`)}
         >
-            {/* Premium Collection Badge */}
-            <div style={{
-                position: 'absolute',
-                top: '16px',
-                left: '16px',
-                zIndex: '20'
-            }}>
-                <div style={{
-                    background: 'linear-gradient(45deg, #b8860b, #fbbf24)',
-                    color: 'white',
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '10px',
-                    fontWeight: '700',
-                    letterSpacing: '1.5px',
-                    textTransform: 'uppercase',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 12px rgba(184, 134, 11, 0.3)'
-                }}>
-                    <Sparkles size={10} />
-                    Premium
-                </div>
-            </div>
 
             {/* Sale Badge */}
             {isOnSale && (
@@ -258,33 +233,6 @@ const ProductCard = ({ product }) => {
                 </div>
             )}
 
-            {/* Multiple Images Indicator */}
-            {hasMultipleImages && (
-                <div style={{
-                    position: 'absolute',
-                    top: '16px',
-                    right: product.bestseller || isOnSale ? '90px' : '16px',
-                    zIndex: '20',
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                }}>
-                    <ImageIcon size={12} color="#b8860b" />
-                    <span style={{
-                        fontSize: '10px',
-                        fontWeight: '700',
-                        color: '#b8860b',
-                        letterSpacing: '0.5px'
-                    }}>
-                        {images.length} views
-                    </span>
-                </div>
-            )}
 
             {/* SKU Badge */}
             <div style={{

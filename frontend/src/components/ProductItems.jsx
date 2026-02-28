@@ -195,31 +195,6 @@ const ProductItem = ({ id, image, images, name, price, originalPrice, salePrice,
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 transform: isHovered ? 'translateY(-10px)' : 'translateY(0)'
             }}>
-                {/* Premium Badge */}
-                <div style={{
-                    position: 'absolute',
-                    top: '16px',
-                    left: '16px',
-                    zIndex: '2'
-                }}>
-                    <div style={{
-                        background: 'linear-gradient(45deg, #b8860b, #fbbf24)',
-                        color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        fontSize: '10px',
-                        fontWeight: '600',
-                        letterSpacing: '1px',
-                        textTransform: 'uppercase',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        boxShadow: '0 4px 12px rgba(184, 134, 11, 0.3)'
-                    }}>
-                        <Sparkles size={10} />
-                        Premium
-                    </div>
-                </div>
 
                 {/* Sale Badge */}
                 {isOnSale && (
@@ -280,35 +255,6 @@ const ProductItem = ({ id, image, images, name, price, originalPrice, salePrice,
                     </div>
                 )}
 
-                {/* Multiple Images Badge */}
-                {hasMultipleImages && (
-                    <div style={{
-                        position: 'absolute',
-                        top: '16px',
-                        right: (isOnSale || product?.bestseller || bestseller) ? '180px' : '16px',
-                        zIndex: '2',
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        backdropFilter: 'blur(4px)',
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                        opacity: isHovered ? 1 : 0.8,
-                        transition: 'opacity 0.3s ease'
-                    }}>
-                        <ImageIcon size={10} color="#b8860b" />
-                        <span style={{
-                            fontSize: '9px',
-                            fontWeight: '600',
-                            color: '#b8860b',
-                            letterSpacing: '0.5px'
-                        }}>
-                            {productImages.length} views
-                        </span>
-                    </div>
-                )}
 
                 {/* SKU Badge */}
                 <div style={{

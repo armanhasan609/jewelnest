@@ -20,7 +20,9 @@ const ProductItem = ({
     deliveryInfo = 'Free shipping & returns',
     warranty = '2-Year Warranty',
     onAddToCart = null,
-    onQuickView = null
+    onQuickView = null,
+    hideQuickAdd = false,
+    hideImageCount = false
 }) => {
     const { addToCart } = useContext(ShopContext);
     const [isHovered, setIsHovered] = useState(false);
@@ -36,7 +38,7 @@ const ProductItem = ({
     const previewRef = useRef(null);
 
     // Luxury gradient fallback
-    const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23D4AF37;stop-opacity:0.1'/%3E%3Cstop offset='50%25' style='stop-color:%23C5A028;stop-opacity:0.05'/%3E%3Cstop offset='100%25' style='stop-color:%23B8860B;stop-opacity:0.1'/%3E%3C/linearGradient%3E%3CradialGradient id='r'%3E%3Cstop offset='0%25' style='stop-color:%23FFD700;stop-opacity:0.2'/%3E%3Cstop offset='100%25' style='stop-color:transparent'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='400' height='500' fill='url(%23g)'/%3E%3Ccircle cx='200' cy='250' r='150' fill='url(%23r)'/%3E%3C/svg%3E";
+    const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23D4AF37;stop-opacity:0.1'/%3E%3Cstop offset='50%25' style='stop-color:%23C5A028;stop-opacity:0.05'/%3E%3Cstop offset='100%25' style='stop-color:%23B8860B;stop-opacity:0.1'/%3E%3C/linearGradient%3E%3CradialGradient id='r'%3E%3Cstop offset='0%25' style='stop-color:%23FFD700;stop-opacity:0.2'/%3E%3Cstop offset='100%25' style='stop-color:transparent'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='400' height='500' fill='url(%23g)'/%3E%3Ccircle cx='200' cy='250' r='150' fill='url(%23r)'/%3E%3C/circle%3E%3C/svg%3E";
 
     // Gold color palette
     const goldColors = {
@@ -125,7 +127,7 @@ const ProductItem = ({
                     style: {
                         background: '#1a1a1a',
                         color: goldColors.primary,
-                        border: `1px solid ${goldColors.primary}30`
+                        border: `1px solid ${goldColors.primary} 30`
                     }
                 });
 
@@ -205,21 +207,19 @@ const ProductItem = ({
     // Container styles
     const containerStyle = {
         textDecoration: 'none',
-        color: '#1a1a1a',
+        color: '#1a202c',
         cursor: 'pointer',
         display: 'block',
-        transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        borderRadius: '24px',
+        transition: 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)',
+        borderRadius: '32px',
         overflow: 'hidden',
         position: 'relative',
-        background: 'linear-gradient(145deg, #1a1a1a, #0f0f0f)',
+        background: '#ffffff',
+        border: `1px solid rgba(184, 134, 11, 0.08)`,
         boxShadow: isHovered
-            ? `0 25px 50px -12px rgba(212, 175, 55, 0.2),
-               0 0 0 1px ${goldColors.primary}20,
-               inset 0 1px 0 ${goldColors.primary}10`
-            : '0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 1px #2a2a2a',
-        transform: isHovered ? 'translateY(-12px) scale(1.02)' : 'translateY(0) scale(1)',
-        animation: 'floatIn 0.8s ease-out'
+            ? `0 30px 60px - 15px rgba(184, 134, 11, 0.2)`
+            : '0 10px 30px -10px rgba(0, 0, 0, 0.05)',
+        transform: isHovered ? 'translateY(-12px)' : 'translateY(0)',
     };
 
     return (
@@ -234,25 +234,22 @@ const ProductItem = ({
             {/* Product Image Container */}
             <div style={{
                 overflow: 'hidden',
-                background: 'linear-gradient(145deg, #0f0f0f, #1a1a1a)',
-                borderRadius: '20px 20px 0 0',
+                background: '#fcfcfc',
+                borderRadius: '24px 24px 0 0',
                 position: 'relative',
-                aspectRatio: '4/5',
-                margin: '16px',
+                aspectRatio: '1/1',
+                margin: '12px',
                 marginBottom: '0'
             }}>
                 {/* Loading Animation */}
                 {!imgLoaded && !imgError && (
-                    <div style={{
+                    <div className="loading-shimmer" style={{
                         position: 'absolute',
                         top: 0,
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)',
-                        backgroundSize: '200% 100%',
-                        animation: 'shimmer 2s infinite',
-                        borderRadius: '20px',
+                        borderRadius: '24px',
                         pointerEvents: 'none'
                     }} />
                 )}
@@ -282,30 +279,31 @@ const ProductItem = ({
                 <div style={{
                     position: 'absolute',
                     inset: 0,
-                    background: `linear-gradient(to bottom, transparent 60%, ${goldColors.primary}05)`,
+                    background: `linear - gradient(to bottom, transparent 60 %, ${goldColors.primary}05)`,
                     opacity: isHovered ? 1 : 0,
                     transition: 'opacity 0.4s ease',
                     pointerEvents: 'none'
                 }} />
 
                 {/* Multiple Images Indicator */}
-                {imageUrls.length > 1 && (
+                {(imageUrls.length > 1 && !hideImageCount) && (
                     <div style={{
                         position: 'absolute',
-                        bottom: '60px',
+                        bottom: '16px',
                         right: '16px',
-                        background: 'rgba(0, 0, 0, 0.8)',
-                        color: goldColors.primary,
-                        fontSize: '11px',
-                        fontWeight: '700',
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: goldColors.dark,
+                        fontSize: '10px',
+                        fontWeight: '800',
                         padding: '6px 12px',
-                        borderRadius: '12px',
-                        backdropFilter: 'blur(4px)',
-                        border: `1px solid ${goldColors.primary}30`,
+                        borderRadius: '30px',
+                        backdropFilter: 'blur(8px)',
+                        border: `1px solid rgba(184, 134, 11, 0.15)`,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
-                        zIndex: '2'
+                        zIndex: '2',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                     }}>
                         <ImageIcon size={10} />
                         {imageUrls.length} Images
@@ -332,33 +330,34 @@ const ProductItem = ({
                             borderRadius: '20px',
                             letterSpacing: '2px',
                             textTransform: 'uppercase',
-                            boxShadow: `0 6px 20px ${goldColors.primary}40`,
+                            boxShadow: `0 6px 20px ${goldColors.primary} 40`,
                             animation: 'glow 2s infinite alternate',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px'
                         }}>
                             <Zap size={10} />
-                            PREMIUM LAUNCH
+                            NEW COLLECTION
                         </div>
                     )}
 
                     {isBestSeller && (
                         <div style={{
-                            background: 'linear-gradient(135deg, #1a1a1a, #333)',
-                            color: goldColors.primary,
+                            background: '#ffffff',
+                            color: goldColors.dark,
                             fontSize: '10px',
-                            fontWeight: '900',
+                            fontWeight: '800',
                             padding: '6px 14px',
                             borderRadius: '20px',
-                            letterSpacing: '2px',
+                            letterSpacing: '1px',
                             textTransform: 'uppercase',
-                            border: `1px solid ${goldColors.primary}30`,
+                            border: `1px solid ${goldColors.primary} 40`,
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '6px'
+                            gap: '6px',
+                            boxShadow: '0 4px 12px rgba(184, 134, 11, 0.1)'
                         }}>
-                            <Star size={10} fill={goldColors.primary} />
+                            <Star size={10} fill={goldColors.primary} stroke={goldColors.dark} />
                             BESTSELLER
                         </div>
                     )}
@@ -380,113 +379,46 @@ const ProductItem = ({
                     )}
                 </div>
 
-                {/* Add to Cart Bottom Bar */}
-                <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
-                    padding: '20px 16px',
-                    transform: isHovered ? 'translateY(0)' : 'translateY(100%)',
-                    transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    backdropFilter: 'blur(10px)',
-                    borderTop: `1px solid ${goldColors.primary}20`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                    pointerEvents: isHovered ? 'auto' : 'none'
-                }}>
+                {/* Add to Cart Quick Overlay */}
+                {!hideQuickAdd && (
                     <div style={{
+                        position: 'absolute',
+                        bottom: '0',
+                        left: '0',
+                        right: '0',
+                        padding: '20px 16px',
+                        background: 'linear-gradient(to top, rgba(255,255,255,0.95), transparent)',
+                        backdropFilter: 'blur(8px)',
+                        transform: isHovered ? 'translateY(0)' : 'translateY(100%)',
+                        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: '4px'
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: '3'
                     }}>
-                        <div style={{
-                            fontSize: '12px',
-                            color: '#999',
-                            fontWeight: '600',
-                            letterSpacing: '1px'
-                        }}>
-                            STARTING FROM
-                        </div>
-                        <div style={{
-                            fontSize: '20px',
-                            fontWeight: '900',
-                            color: goldColors.primary,
-                            display: 'flex',
-                            alignItems: 'baseline',
-                            gap: '6px'
-                        }}>
-                            ₹{formatPrice(discountPrice || price)}
-                            {discountPrice && (
-                                <span style={{
-                                    fontSize: '14px',
-                                    color: '#666',
-                                    textDecoration: 'line-through',
-                                    fontWeight: '500'
-                                }}>
-                                    ₹{formatPrice(price)}
-                                </span>
-                            )}
-                        </div>
+                        <button
+                            onClick={handleAddToCart}
+                            style={{
+                                background: goldColors.gradient,
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '50px',
+                                padding: '10px 20px',
+                                fontSize: '13px',
+                                fontWeight: '700',
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                boxShadow: '0 8px 20px rgba(184, 134, 11, 0.3)',
+                            }}
+                        >
+                            <ShoppingBag size={18} />
+                            QUICK ADD
+                        </button>
                     </div>
-
-                    <button
-                        style={{
-                            background: goldColors.gradient,
-                            color: '#000',
-                            border: 'none',
-                            borderRadius: '12px',
-                            padding: '12px 24px',
-                            fontSize: '12px',
-                            fontWeight: '900',
-                            cursor: isAddingToCart ? 'not-allowed' : 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            letterSpacing: '1px',
-                            textTransform: 'uppercase',
-                            boxShadow: `0 8px 25px ${goldColors.primary}40`,
-                            transition: 'all 0.3s ease',
-                            animation: isAnimatingCart ? 'cartBounce 0.6s ease' : 'none'
-                        }}
-                        onClick={handleAddToCart}
-                        disabled={isAddingToCart}
-                        onMouseEnter={(e) => {
-                            if (!isAddingToCart) {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = `0 12px 30px ${goldColors.primary}60`;
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isAddingToCart) {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = `0 8px 25px ${goldColors.primary}40`;
-                            }
-                        }}
-                    >
-                        {isAddingToCart ? (
-                            <>
-                                <div style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    border: `2px solid #000`,
-                                    borderTopColor: 'transparent',
-                                    borderRadius: '50%',
-                                    animation: 'spin 1s linear infinite'
-                                }} />
-                                ADDING...
-                            </>
-                        ) : (
-                            <>
-                                <ShoppingBag size={16} />
-                                ADD TO CART
-                            </>
-                        )}
-                    </button>
-                </div>
+                )}
 
                 {/* Stock Status */}
                 {stockStatus !== 'in-stock' && (
@@ -494,18 +426,19 @@ const ProductItem = ({
                         position: 'absolute',
                         bottom: '16px',
                         left: '16px',
-                        background: 'rgba(0, 0, 0, 0.8)',
-                        color: stockStatus === 'low-stock' ? '#fbbf24' : '#ef4444',
-                        fontSize: '11px',
-                        fontWeight: '700',
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: stockStatus === 'low-stock' ? '#d97706' : '#dc2626',
+                        fontSize: '10px',
+                        fontWeight: '800',
                         padding: '6px 12px',
-                        borderRadius: '12px',
-                        backdropFilter: 'blur(4px)',
-                        border: `1px solid ${stockStatus === 'low-stock' ? '#fbbf2440' : '#ef444440'}`,
+                        borderRadius: '30px',
+                        backdropFilter: 'blur(8px)',
+                        border: `1px solid ${stockStatus === 'low-stock' ? '#d9770640' : '#dc262640'} `,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
-                        zIndex: '2'
+                        zIndex: '2',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                     }}>
                         {stockStatus === 'low-stock' ? (
                             <>
@@ -521,21 +454,19 @@ const ProductItem = ({
 
             {/* Product Info Container */}
             <div style={{
-                padding: '20px',
-                background: 'linear-gradient(to bottom, #1a1a1a, #0f0f0f)',
-                borderTop: `1px solid ${goldColors.primary}10`,
+                padding: '24px',
+                background: '#ffffff',
                 position: 'relative'
             }}>
                 {/* Category */}
                 {category && (
                     <div style={{
-                        fontSize: '10px',
+                        fontSize: '11px',
                         fontWeight: '700',
-                        color: goldColors.primary,
+                        color: '#64748b',
                         textTransform: 'uppercase',
-                        letterSpacing: '3px',
-                        marginBottom: '12px',
-                        opacity: 0.8
+                        letterSpacing: '2px',
+                        marginBottom: '8px',
                     }}>
                         {category}
                     </div>
@@ -551,13 +482,13 @@ const ProductItem = ({
                 }}>
                     {/* Product Name */}
                     <p style={{
-                        fontSize: '16px',
+                        fontSize: '18px',
                         fontWeight: '700',
-                        color: '#fff',
+                        color: '#1a202c',
                         margin: '0',
                         lineHeight: '1.4',
                         display: '-webkit-box',
-                        WebkitLineClamp: '2',
+                        WebkitLineClamp: '1',
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -574,17 +505,18 @@ const ProductItem = ({
                         flexShrink: 0
                     }}>
                         <span style={{
-                            fontSize: '16px',
-                            fontWeight: '700',
-                            color: goldColors.primary
+                            fontSize: '20px',
+                            fontWeight: '800',
+                            color: goldColors.dark
                         }}>
                             ₹{formatPrice(discountPrice || price)}
                         </span>
                         {discountPrice && (
                             <span style={{
-                                fontSize: '11px',
-                                color: '#666',
-                                textDecoration: 'line-through'
+                                fontSize: '13px',
+                                color: '#94a3b8',
+                                textDecoration: 'line-through',
+                                fontWeight: '500'
                             }}>
                                 ₹{formatPrice(price)}
                             </span>
@@ -597,27 +529,29 @@ const ProductItem = ({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '16px',
-                    paddingTop: '12px',
-                    borderTop: `1px solid ${goldColors.primary}10`
+                    paddingTop: '16px',
+                    borderTop: `1px solid rgba(184, 134, 11, 0.08)`
                 }}>
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
-                        fontSize: '11px',
-                        color: '#888'
+                        fontSize: '12px',
+                        color: '#64748b',
+                        fontWeight: '500'
                     }}>
-                        <Shield size={12} color={goldColors.primary} />
+                        <Shield size={14} color={goldColors.dark} />
                         <span>Certified</span>
                     </div>
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
-                        fontSize: '11px',
-                        color: '#888'
+                        fontSize: '12px',
+                        color: '#64748b',
+                        fontWeight: '500'
                     }}>
-                        <Truck size={12} color={goldColors.primary} />
+                        <Truck size={14} color={goldColors.dark} />
                         <span>Free Delivery</span>
                     </div>
                 </div>
@@ -652,14 +586,14 @@ const ProductItem = ({
                             maxWidth: '1200px',
                             maxHeight: '90vh',
                             boxShadow: `
-                                0 50px 100px -20px rgba(212, 175, 55, 0.3),
-                                0 30px 60px -30px rgba(0, 0, 0, 0.5),
-                                inset 0 1px 0 ${goldColors.primary}10
+0 50px 100px - 20px rgba(212, 175, 55, 0.3),
+    0 30px 60px - 30px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 ${goldColors.primary} 10
                             `,
                             animation: 'modalSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
                             position: 'relative',
                             overflow: 'hidden',
-                            border: `1px solid ${goldColors.primary}20`
+                            border: `1px solid ${goldColors.primary} 20`
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
@@ -672,7 +606,7 @@ const ProductItem = ({
                                 right: '24px',
                                 background: 'linear-gradient(145deg, #1a1a1a, #0f0f0f)',
                                 color: goldColors.primary,
-                                border: `1px solid ${goldColors.primary}30`,
+                                border: `1px solid ${goldColors.primary} 30`,
                                 borderRadius: '50%',
                                 width: '44px',
                                 height: '44px',
@@ -718,12 +652,12 @@ const ProductItem = ({
                                     background: 'linear-gradient(145deg, #0a0a0a, #111)',
                                     aspectRatio: '1/1',
                                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
-                                    border: `1px solid ${goldColors.primary}10`
+                                    border: `1px solid ${goldColors.primary} 10`
                                 }}>
                                     {/* Main Image */}
                                     <img
                                         src={imageUrls[selectedImageIndex] || fallbackImage}
-                                        alt={`${name} - Image ${selectedImageIndex + 1}`}
+                                        alt={`${name} - Image ${selectedImageIndex + 1} `}
                                         style={{
                                             width: '100%',
                                             height: '100%',
@@ -744,7 +678,7 @@ const ProductItem = ({
                                                     transform: 'translateY(-50%)',
                                                     background: 'rgba(0, 0, 0, 0.6)',
                                                     color: 'white',
-                                                    border: `1px solid ${goldColors.primary}`,
+                                                    border: `1px solid ${goldColors.primary} `,
                                                     borderRadius: '50%',
                                                     width: '44px',
                                                     height: '44px',
@@ -775,7 +709,7 @@ const ProductItem = ({
                                                     transform: 'translateY(-50%)',
                                                     background: 'rgba(0, 0, 0, 0.6)',
                                                     color: 'white',
-                                                    border: `1px solid ${goldColors.primary}`,
+                                                    border: `1px solid ${goldColors.primary} `,
                                                     borderRadius: '50%',
                                                     width: '44px',
                                                     height: '44px',
@@ -833,7 +767,7 @@ const ProductItem = ({
                                                 padding: '10px 20px',
                                                 borderRadius: '25px',
                                                 letterSpacing: '2px',
-                                                boxShadow: `0 10px 30px ${goldColors.primary}40`,
+                                                boxShadow: `0 10px 30px ${goldColors.primary} 40`,
                                                 animation: 'glow 2s infinite alternate'
                                             }}>
                                                 NEW ARRIVAL
@@ -864,7 +798,7 @@ const ProductItem = ({
                                                 height: '80px',
                                                 borderRadius: '12px',
                                                 background: 'linear-gradient(145deg, #0a0a0a, #111)',
-                                                border: `2px solid ${selectedImageIndex === index ? goldColors.primary : '#333'}`,
+                                                border: `2px solid ${selectedImageIndex === index ? goldColors.primary : '#333'} `,
                                                 cursor: 'pointer',
                                                 transition: 'all 0.3s ease',
                                                 overflow: 'hidden',
@@ -885,7 +819,7 @@ const ProductItem = ({
                                         >
                                             <img
                                                 src={imgUrl || fallbackImage}
-                                                alt={`Thumbnail ${index + 1}`}
+                                                alt={`Thumbnail ${index + 1} `}
                                                 style={{
                                                     width: '100%',
                                                     height: '100%',
@@ -910,92 +844,54 @@ const ProductItem = ({
                             </div>
 
                             {/* Right Column - Details */}
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '32px',
-                                overflowY: 'auto',
-                                maxHeight: '80vh'
-                            }}>
-                                {/* Header */}
-                                <div>
-                                    <div style={{
-                                        fontSize: '12px',
-                                        fontWeight: '700',
-                                        color: goldColors.primary,
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '3px',
-                                        marginBottom: '16px'
-                                    }}>
-                                        {category} COLLECTION
-                                    </div>
-
-                                    <h1 style={{
-                                        fontSize: '36px',
-                                        fontWeight: '800',
-                                        color: '#fff',
-                                        margin: '0 0 20px 0',
-                                        lineHeight: '1.2'
-                                    }}>
-                                        {name}
-                                    </h1>
-
-                                    {/* Description */}
-                                    <p style={{
-                                        fontSize: '16px',
-                                        color: '#aaa',
-                                        lineHeight: '1.6',
-                                        marginBottom: '32px'
-                                    }}>
-                                        {description || 'Experience luxury craftsmanship with this exquisite piece. Meticulously handcrafted using premium materials for timeless elegance.'}
-                                    </p>
+                            <div>
+                                <div style={{
+                                    fontSize: '12px',
+                                    fontWeight: '700',
+                                    color: goldColors.primary,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '3px',
+                                    marginBottom: '16px'
+                                }}>
+                                    {category} COLLECTION
                                 </div>
 
-                                {/* Price Section */}
-                                <div style={{
-                                    background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
-                                    borderRadius: '20px',
-                                    padding: '24px',
-                                    border: `1px solid ${goldColors.primary}10`
+                                <h1 style={{
+                                    fontSize: '36px',
+                                    fontWeight: '800',
+                                    color: '#fff',
+                                    margin: '0 0 20px 0',
+                                    lineHeight: '1.2'
                                 }}>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'baseline',
-                                        gap: '20px',
-                                        marginBottom: '16px'
-                                    }}>
-                                        {discountPrice ? (
-                                            <>
-                                                <span style={{
-                                                    fontSize: '48px',
-                                                    fontWeight: '900',
-                                                    background: goldColors.gradient,
-                                                    WebkitBackgroundClip: 'text',
-                                                    WebkitTextFillColor: 'transparent'
-                                                }}>
-                                                    ₹{formatPrice(discountPrice)}
-                                                </span>
-                                                <span style={{
-                                                    fontSize: '28px',
-                                                    color: '#666',
-                                                    textDecoration: 'line-through',
-                                                    fontWeight: '500'
-                                                }}>
-                                                    ₹{formatPrice(price)}
-                                                </span>
-                                                <span style={{
-                                                    background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
-                                                    color: '#fff',
-                                                    padding: '8px 20px',
-                                                    borderRadius: '25px',
-                                                    fontSize: '16px',
-                                                    fontWeight: '900',
-                                                    letterSpacing: '1px'
-                                                }}>
-                                                    SAVE ₹{formatPrice(price - discountPrice)}
-                                                </span>
-                                            </>
-                                        ) : (
+                                    {name}
+                                </h1>
+
+                                {/* Description */}
+                                <p style={{
+                                    fontSize: '16px',
+                                    color: '#aaa',
+                                    lineHeight: '1.6',
+                                    marginBottom: '32px'
+                                }}>
+                                    {description || 'Experience luxury craftsmanship with this exquisite piece. Meticulously handcrafted using premium materials for timeless elegance.'}
+                                </p>
+                            </div>
+
+                            {/* Price Section */}
+                            <div style={{
+                                background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
+                                borderRadius: '20px',
+                                padding: '24px',
+                                border: `1px solid ${goldColors.primary} 10`
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'baseline',
+                                    gap: '20px',
+                                    marginBottom: '16px'
+                                }}>
+                                    {discountPrice ? (
+                                        <>
                                             <span style={{
                                                 fontSize: '48px',
                                                 fontWeight: '900',
@@ -1003,229 +899,43 @@ const ProductItem = ({
                                                 WebkitBackgroundClip: 'text',
                                                 WebkitTextFillColor: 'transparent'
                                             }}>
+                                                ₹{formatPrice(discountPrice)}
+                                            </span>
+                                            <span style={{
+                                                fontSize: '28px',
+                                                color: '#666',
+                                                textDecoration: 'line-through',
+                                                fontWeight: '500'
+                                            }}>
                                                 ₹{formatPrice(price)}
                                             </span>
-                                        )}
-                                    </div>
-
-                                    {/* Size Selection */}
-                                    <div style={{ marginBottom: '24px' }}>
-                                        <div style={{
-                                            fontSize: '14px',
-                                            fontWeight: '600',
-                                            color: '#fff',
-                                            marginBottom: '12px',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '1px'
-                                        }}>
-                                            Select Size
-                                        </div>
-                                        <div style={{
-                                            display: 'flex',
-                                            gap: '12px',
-                                            flexWrap: 'wrap'
-                                        }}>
-                                            {sizes.map((size) => (
-                                                <button
-                                                    key={size.id}
-                                                    onClick={() => setSelectedSize(size.id)}
-                                                    style={{
-                                                        background: selectedSize === size.id
-                                                            ? goldColors.gradient
-                                                            : 'linear-gradient(145deg, #1a1a1a, #0f0f0f)',
-                                                        color: selectedSize === size.id ? '#000' : '#aaa',
-                                                        border: `1px solid ${selectedSize === size.id
-                                                            ? goldColors.primary
-                                                            : '#333'
-                                                            }`,
-                                                        borderRadius: '12px',
-                                                        padding: '12px 24px',
-                                                        fontSize: '14px',
-                                                        fontWeight: '700',
-                                                        cursor: 'pointer',
-                                                        transition: 'all 0.3s ease',
-                                                        minWidth: '80px'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        if (selectedSize !== size.id) {
-                                                            e.currentTarget.style.background = 'linear-gradient(145deg, #2a2a2a, #1a1a1a)';
-                                                            e.currentTarget.style.color = '#fff';
-                                                        }
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        if (selectedSize !== size.id) {
-                                                            e.currentTarget.style.background = 'linear-gradient(145deg, #1a1a1a, #0f0f0f)';
-                                                            e.currentTarget.style.color = '#aaa';
-                                                        }
-                                                    }}
-                                                >
-                                                    {size.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Quantity Selection */}
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '20px',
-                                        marginBottom: '32px'
-                                    }}>
-                                        <div style={{
-                                            fontSize: '14px',
-                                            fontWeight: '600',
-                                            color: '#fff',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '1px'
-                                        }}>
-                                            Quantity
-                                        </div>
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '16px',
-                                            background: 'linear-gradient(145deg, #1a1a1a, #0f0f0f)',
-                                            padding: '8px 16px',
-                                            borderRadius: '12px',
-                                            border: '1px solid #333'
-                                        }}>
-                                            <button
-                                                onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                                                style={{
-                                                    background: 'transparent',
-                                                    color: goldColors.primary,
-                                                    border: 'none',
-                                                    fontSize: '20px',
-                                                    fontWeight: '700',
-                                                    cursor: 'pointer',
-                                                    width: '32px',
-                                                    height: '32px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    borderRadius: '8px',
-                                                    transition: 'all 0.2s ease'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.background = goldColors.gradient;
-                                                    e.currentTarget.style.color = '#000';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.background = 'transparent';
-                                                    e.currentTarget.style.color = goldColors.primary;
-                                                }}
-                                            >
-                                                -
-                                            </button>
                                             <span style={{
-                                                fontSize: '18px',
-                                                fontWeight: '700',
+                                                background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
                                                 color: '#fff',
-                                                minWidth: '40px',
-                                                textAlign: 'center'
+                                                padding: '8px 20px',
+                                                borderRadius: '25px',
+                                                fontSize: '16px',
+                                                fontWeight: '900',
+                                                letterSpacing: '1px'
                                             }}>
-                                                {quantity}
+                                                SAVE ₹{formatPrice(price - discountPrice)}
                                             </span>
-                                            <button
-                                                onClick={() => setQuantity(q => q + 1)}
-                                                style={{
-                                                    background: 'transparent',
-                                                    color: goldColors.primary,
-                                                    border: 'none',
-                                                    fontSize: '20px',
-                                                    fontWeight: '700',
-                                                    cursor: 'pointer',
-                                                    width: '32px',
-                                                    height: '32px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    borderRadius: '8px',
-                                                    transition: 'all 0.2s ease'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.background = goldColors.gradient;
-                                                    e.currentTarget.style.color = '#000';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.background = 'transparent';
-                                                    e.currentTarget.style.color = goldColors.primary;
-                                                }}
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Add to Cart Button */}
-                                    <button
-                                        onClick={handleAddToCart}
-                                        disabled={isAddingToCart || stockStatus === 'out-of-stock'}
-                                        style={{
-                                            width: '100%',
-                                            background: stockStatus === 'out-of-stock'
-                                                ? '#666'
-                                                : goldColors.gradient,
-                                            color: stockStatus === 'out-of-stock' ? '#aaa' : '#000',
-                                            border: 'none',
-                                            borderRadius: '16px',
-                                            padding: '20px',
-                                            fontSize: '16px',
+                                        </>
+                                    ) : (
+                                        <span style={{
+                                            fontSize: '48px',
                                             fontWeight: '900',
-                                            cursor: stockStatus === 'out-of-stock' || isAddingToCart
-                                                ? 'not-allowed'
-                                                : 'pointer',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '2px',
-                                            boxShadow: stockStatus === 'out-of-stock'
-                                                ? 'none'
-                                                : `0 12px 40px ${goldColors.primary}40`,
-                                            transition: 'all 0.3s ease',
-                                            animation: isAnimatingCart ? 'cartBounce 0.6s ease' : 'none',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '12px'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (stockStatus !== 'out-of-stock' && !isAddingToCart) {
-                                                e.currentTarget.style.transform = 'translateY(-4px)';
-                                                e.currentTarget.style.boxShadow = `0 20px 50px ${goldColors.primary}60`;
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (stockStatus !== 'out-of-stock' && !isAddingToCart) {
-                                                e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = `0 12px 40px ${goldColors.primary}40`;
-                                            }
-                                        }}
-                                    >
-                                        {isAddingToCart ? (
-                                            <>
-                                                <div style={{
-                                                    width: '20px',
-                                                    height: '20px',
-                                                    border: `2px solid #000`,
-                                                    borderTopColor: 'transparent',
-                                                    borderRadius: '50%',
-                                                    animation: 'spin 1s linear infinite'
-                                                }} />
-                                                ADDING TO CART...
-                                            </>
-                                        ) : stockStatus === 'out-of-stock' ? (
-                                            'OUT OF STOCK'
-                                        ) : (
-                                            <>
-                                                <ShoppingBag size={20} />
-                                                ADD TO CART - ₹{formatPrice((discountPrice || price) * quantity)}
-                                            </>
-                                        )}
-                                    </button>
+                                            background: goldColors.gradient,
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent'
+                                        }}>
+                                            ₹{formatPrice(price)}
+                                        </span>
+                                    )}
                                 </div>
 
-                                {/*Add price show without hover as well */}
-                                <div>
+                                {/* Size Selection */}
+                                <div style={{ marginBottom: '24px' }}>
                                     <div style={{
                                         fontSize: '14px',
                                         fontWeight: '600',
@@ -1234,133 +944,348 @@ const ProductItem = ({
                                         textTransform: 'uppercase',
                                         letterSpacing: '1px'
                                     }}>
-                                        Price Details
+                                        Select Size
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '12px',
+                                        flexWrap: 'wrap'
+                                    }}>
+                                        {sizes.map((size) => (
+                                            <button
+                                                key={size.id}
+                                                onClick={() => setSelectedSize(size.id)}
+                                                style={{
+                                                    background: selectedSize === size.id
+                                                        ? goldColors.gradient
+                                                        : 'linear-gradient(145deg, #1a1a1a, #0f0f0f)',
+                                                    color: selectedSize === size.id ? '#000' : '#aaa',
+                                                    border: `1px solid ${selectedSize === size.id
+                                                        ? goldColors.primary
+                                                        : '#333'
+                                                        } `,
+                                                    borderRadius: '12px',
+                                                    padding: '12px 24px',
+                                                    fontSize: '14px',
+                                                    fontWeight: '700',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.3s ease',
+                                                    minWidth: '80px'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (selectedSize !== size.id) {
+                                                        e.currentTarget.style.background = 'linear-gradient(145deg, #2a2a2a, #1a1a1a)';
+                                                        e.currentTarget.style.color = '#fff';
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (selectedSize !== size.id) {
+                                                        e.currentTarget.style.background = 'linear-gradient(145deg, #1a1a1a, #0f0f0f)';
+                                                        e.currentTarget.style.color = '#aaa';
+                                                    }
+                                                }}
+                                            >
+                                                {size.label}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 
-                                {/* Features Grid */}
+                                {/* Quantity Selection */}
                                 <div style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(2, 1fr)',
-                                    gap: '16px'
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '20px',
+                                    marginBottom: '32px'
                                 }}>
                                     <div style={{
-                                        background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
-                                        borderRadius: '16px',
-                                        padding: '20px',
-                                        border: `1px solid ${goldColors.primary}10`,
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        color: '#fff',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px'
+                                    }}>
+                                        Quantity
+                                    </div>
+                                    <div style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '12px'
+                                        gap: '16px',
+                                        background: 'linear-gradient(145deg, #1a1a1a, #0f0f0f)',
+                                        padding: '8px 16px',
+                                        borderRadius: '12px',
+                                        border: '1px solid #333'
                                     }}>
-                                        <Shield size={24} color={goldColors.primary} />
-                                        <div>
-                                            <div style={{
-                                                fontSize: '12px',
-                                                fontWeight: '600',
+                                        <button
+                                            onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                                            style={{
+                                                background: 'transparent',
                                                 color: goldColors.primary,
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '1px'
-                                            }}>
-                                                Certified
-                                            </div>
+                                                border: 'none',
+                                                fontSize: '20px',
+                                                fontWeight: '700',
+                                                cursor: 'pointer',
+                                                width: '32px',
+                                                height: '32px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                borderRadius: '8px',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = goldColors.gradient;
+                                                e.currentTarget.style.color = '#000';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = 'transparent';
+                                                e.currentTarget.style.color = goldColors.primary;
+                                            }}
+                                        >
+                                            -
+                                        </button>
+                                        <span style={{
+                                            fontSize: '18px',
+                                            fontWeight: '700',
+                                            color: '#fff',
+                                            minWidth: '40px',
+                                            textAlign: 'center'
+                                        }}>
+                                            {quantity}
+                                        </span>
+                                        <button
+                                            onClick={() => setQuantity(q => q + 1)}
+                                            style={{
+                                                background: 'transparent',
+                                                color: goldColors.primary,
+                                                border: 'none',
+                                                fontSize: '20px',
+                                                fontWeight: '700',
+                                                cursor: 'pointer',
+                                                width: '32px',
+                                                height: '32px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                borderRadius: '8px',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = goldColors.gradient;
+                                                e.currentTarget.style.color = '#000';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = 'transparent';
+                                                e.currentTarget.style.color = goldColors.primary;
+                                            }}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Add to Cart Button */}
+                                <button
+                                    onClick={handleAddToCart}
+                                    disabled={isAddingToCart || stockStatus === 'out-of-stock'}
+                                    style={{
+                                        width: '100%',
+                                        background: stockStatus === 'out-of-stock'
+                                            ? '#666'
+                                            : goldColors.gradient,
+                                        color: stockStatus === 'out-of-stock' ? '#aaa' : '#000',
+                                        border: 'none',
+                                        borderRadius: '16px',
+                                        padding: '20px',
+                                        fontSize: '16px',
+                                        fontWeight: '900',
+                                        cursor: stockStatus === 'out-of-stock' || isAddingToCart
+                                            ? 'not-allowed'
+                                            : 'pointer',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '2px',
+                                        boxShadow: stockStatus === 'out-of-stock'
+                                            ? 'none'
+                                            : `0 12px 40px ${goldColors.primary} 40`,
+                                        transition: 'all 0.3s ease',
+                                        animation: isAnimatingCart ? 'cartBounce 0.6s ease' : 'none',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '12px'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (stockStatus !== 'out-of-stock' && !isAddingToCart) {
+                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                            e.currentTarget.style.boxShadow = `0 20px 50px ${goldColors.primary} 60`;
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (stockStatus !== 'out-of-stock' && !isAddingToCart) {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = `0 12px 40px ${goldColors.primary} 40`;
+                                        }
+                                    }}
+                                >
+                                    {isAddingToCart ? (
+                                        <>
                                             <div style={{
-                                                fontSize: '14px',
-                                                color: '#aaa',
-                                                fontWeight: '500'
-                                            }}>
-                                                Hallmarked & Authentic
-                                            </div>
+                                                width: '20px',
+                                                height: '20px',
+                                                border: `2px solid #000`,
+                                                borderTopColor: 'transparent',
+                                                borderRadius: '50%',
+                                                animation: 'spin 1s linear infinite'
+                                            }} />
+                                            ADDING TO CART...
+                                        </>
+                                    ) : stockStatus === 'out-of-stock' ? (
+                                        'OUT OF STOCK'
+                                    ) : (
+                                        <>
+                                            <ShoppingBag size={20} />
+                                            ADD TO CART - ₹{formatPrice((discountPrice || price) * quantity)}
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            {/*Add price show without hover as well */}
+                            <div>
+                                <div style={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#fff',
+                                    marginBottom: '12px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '1px'
+                                }}>
+                                    Price Details
+                                </div>
+                            </div>
+
+                            {/* Features Grid */}
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, 1fr)',
+                                gap: '16px'
+                            }}>
+                                <div style={{
+                                    background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
+                                    borderRadius: '16px',
+                                    padding: '20px',
+                                    border: `1px solid ${goldColors.primary} 10`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <Shield size={24} color={goldColors.primary} />
+                                    <div>
+                                        <div style={{
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            color: goldColors.primary,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '1px'
+                                        }}>
+                                            Certified
+                                        </div>
+                                        <div style={{
+                                            fontSize: '14px',
+                                            color: '#aaa',
+                                            fontWeight: '500'
+                                        }}>
+                                            Hallmarked & Authentic
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div style={{
-                                        background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
-                                        borderRadius: '16px',
-                                        padding: '20px',
-                                        border: `1px solid ${goldColors.primary}10`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '12px'
-                                    }}>
-                                        <Truck size={24} color={goldColors.primary} />
-                                        <div>
-                                            <div style={{
-                                                fontSize: '12px',
-                                                fontWeight: '600',
-                                                color: goldColors.primary,
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '1px'
-                                            }}>
-                                                Free Delivery
-                                            </div>
-                                            <div style={{
-                                                fontSize: '14px',
-                                                color: '#aaa',
-                                                fontWeight: '500'
-                                            }}>
-                                                2-3 Business Days
-                                            </div>
+                                <div style={{
+                                    background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
+                                    borderRadius: '16px',
+                                    padding: '20px',
+                                    border: `1px solid ${goldColors.primary} 10`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <Truck size={24} color={goldColors.primary} />
+                                    <div>
+                                        <div style={{
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            color: goldColors.primary,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '1px'
+                                        }}>
+                                            Free Delivery
+                                        </div>
+                                        <div style={{
+                                            fontSize: '14px',
+                                            color: '#aaa',
+                                            fontWeight: '500'
+                                        }}>
+                                            2-3 Business Days
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div style={{
-                                        background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
-                                        borderRadius: '16px',
-                                        padding: '20px',
-                                        border: `1px solid ${goldColors.primary}10`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '12px'
-                                    }}>
-                                        <RotateCw size={24} color={goldColors.primary} />
-                                        <div>
-                                            <div style={{
-                                                fontSize: '12px',
-                                                fontWeight: '600',
-                                                color: goldColors.primary,
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '1px'
-                                            }}>
-                                                Easy Returns
-                                            </div>
-                                            <div style={{
-                                                fontSize: '14px',
-                                                color: '#aaa',
-                                                fontWeight: '500'
-                                            }}>
-                                                30-Day Policy
-                                            </div>
+                                <div style={{
+                                    background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
+                                    borderRadius: '16px',
+                                    padding: '20px',
+                                    border: `1px solid ${goldColors.primary} 10`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <RotateCw size={24} color={goldColors.primary} />
+                                    <div>
+                                        <div style={{
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            color: goldColors.primary,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '1px'
+                                        }}>
+                                            Easy Returns
+                                        </div>
+                                        <div style={{
+                                            fontSize: '14px',
+                                            color: '#aaa',
+                                            fontWeight: '500'
+                                        }}>
+                                            30-Day Policy
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div style={{
-                                        background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
-                                        borderRadius: '16px',
-                                        padding: '20px',
-                                        border: `1px solid ${goldColors.primary}10`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '12px'
-                                    }}>
-                                        <CheckCircle size={24} color={goldColors.primary} />
-                                        <div>
-                                            <div style={{
-                                                fontSize: '12px',
-                                                fontWeight: '600',
-                                                color: goldColors.primary,
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '1px'
-                                            }}>
-                                                2-Year Warranty
-                                            </div>
-                                            <div style={{
-                                                fontSize: '14px',
-                                                color: '#aaa',
-                                                fontWeight: '500'
-                                            }}>
-                                                Guaranteed Quality
-                                            </div>
+                                <div style={{
+                                    background: 'linear-gradient(145deg, rgba(212, 175, 55, 0.05), rgba(196, 160, 40, 0.02))',
+                                    borderRadius: '16px',
+                                    padding: '20px',
+                                    border: `1px solid ${goldColors.primary} 10`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <CheckCircle size={24} color={goldColors.primary} />
+                                    <div>
+                                        <div style={{
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            color: goldColors.primary,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '1px'
+                                        }}>
+                                            2-Year Warranty
+                                        </div>
+                                        <div style={{
+                                            fontSize: '14px',
+                                            color: '#aaa',
+                                            fontWeight: '500'
+                                        }}>
+                                            Guaranteed Quality
                                         </div>
                                     </div>
                                 </div>
@@ -1369,87 +1294,6 @@ const ProductItem = ({
                     </div>
                 </div>
             )}
-
-            {/* CSS Animations */}
-            <style>
-                {`
-                @keyframes floatIn {
-                    0% {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    100% {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                @keyframes shimmer {
-                    0% {
-                        background-position: -200% 0;
-                    }
-                    100% {
-                        background-position: 200% 0;
-                    }
-                }
-
-                @keyframes spin {
-                    0% {
-                        transform: rotate(0deg);
-                    }
-                    100% {
-                        transform: rotate(360deg);
-                    }
-                }
-
-                @keyframes cartBounce {
-                    0%, 100% {
-                        transform: scale(1);
-                    }
-                    50% {
-                        transform: scale(0.95);
-                    }
-                }
-
-                @keyframes glow {
-                    0% {
-                        box-shadow: 0 6px 20px ${goldColors.primary}40;
-                    }
-                    100% {
-                        box-shadow: 0 6px 30px ${goldColors.primary}80;
-                    }
-                }
-
-                @keyframes pulseRed {
-                    0%, 100% {
-                        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
-                    }
-                    50% {
-                        box-shadow: 0 6px 30px rgba(220, 38, 38, 0.6);
-                    }
-                }
-
-                @keyframes fadeIn {
-                    0% {
-                        opacity: 0;
-                    }
-                    100% {
-                        opacity: 1;
-                    }
-                }
-
-                @keyframes modalSlideIn {
-                    0% {
-                        opacity: 0;
-                        transform: translateY(60px) scale(0.95);
-                    }
-                    100% {
-                        opacity: 1;
-                        transform: translateY(0) scale(1);
-                    }
-                }
-                `}
-            </style>
         </Link>
     );
 };

@@ -180,7 +180,7 @@ const TodaySale = () => {
                             opacity: '0.9',
                             marginTop: '10px',
                             fontStyle: 'italic'
-                        }}>Limited-time exclusive offers on premium jewelry</p>
+                        }}>Limited-time exclusive offers on high-end jewelry</p>
                     </div>
                 </div>
 
@@ -562,7 +562,7 @@ const TodaySale = () => {
                         margin: '0 auto 30px',
                         lineHeight: '1.6'
                     }}>
-                        Great deals are being prepared! Come back tomorrow for exclusive offers on premium jewelry.
+                        Great deals are being prepared! Come back tomorrow for exclusive offers on high-quality jewelry.
                     </p>
                     <button
                         onClick={() => navigate('/collection')}

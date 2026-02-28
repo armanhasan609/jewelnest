@@ -21,7 +21,7 @@ const Home = () => {
             <div style={{
                 position: 'relative',
                 zIndex: 10,
-                backgroundColor: 'white',
+                backgroundColor: '#f5f2e8',
                 pointerEvents: 'auto'
             }}>
                 <LatestCollection />
@@ -165,7 +165,7 @@ const Home = () => {
                         paddingTop: '50px'
                     }}>
                         {[
-                            { label: 'Premium Quality', value: '100%' },
+                            { label: 'High Quality', value: '100%' },
                             { label: 'Happy Customers', value: '5K+' },
                             { label: 'Experience', value: '15 Yrs' },
                             { label: 'Design Awards', value: '25+' }

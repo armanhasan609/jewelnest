@@ -14,6 +14,9 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
 
+    const [lastScrollY, setLastScrollY] = useState(0);
+    const [isVisible, setIsVisible] = useState(true);
+
     const navigate = useNavigate();
     const location = useLocation();
     const dropdownRef = useRef(null);
@@ -21,11 +24,26 @@ const Navbar = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
+            const currentScrollY = window.scrollY;
+
+            // Show background when scrolled > 20
+            setIsScrolled(currentScrollY > 20);
+
+            // Auto-hide logic: 
+            // Hide when scrolling down (current > last) and passed a threshold (100)
+            // Show when scrolling up (current < last)
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                setIsVisible(false);
+                setIsProfileDropdownOpen(false); // Close dropdown if it was open
+            } else {
+                setIsVisible(true);
+            }
+
+            setLastScrollY(currentScrollY);
         };
-        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+    }, [lastScrollY]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -62,17 +80,23 @@ const Navbar = () => {
     };
 
     const navStyle = {
-        position: "sticky",
+        position: "fixed",
         top: "0",
+        left: "0",
+        right: "0",
         zIndex: "1000",
         transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+        transform: isVisible ? "translateY(0)" : "translateY(-100%)",
         background: isScrolled
             ? "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%)"
             : "#ffffff",
         backdropFilter: isScrolled ? "blur(20px)" : "none",
+        borderBottom: isScrolled
+            ? "1px solid rgba(184, 134, 11, 0.1)"
+            : "1px solid rgba(0, 0, 0, 0.05)",
         boxShadow: isScrolled
-            ? "0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)"
-            : "0 1px 0 rgba(0, 0, 0, 0.05)",
+            ? "0 10px 40px rgba(0, 0, 0, 0.08)"
+            : "none",
         padding: isScrolled ? "12px 5%" : "18px 5%",
         display: "flex",
         alignItems: "center",

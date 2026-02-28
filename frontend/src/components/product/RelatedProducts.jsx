@@ -195,59 +195,6 @@ const RelatedProducts = ({ category, products }) => {
                     Discover pieces that perfectly complement your style. Each selection is curated to match the sophistication and quality of your previous choice.
                 </p>
 
-                {/* Image Statistics */}
-                {!isLoading && related.length > 0 && (
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '16px',
-                        marginBottom: '24px',
-                        flexWrap: 'wrap'
-                    }}>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '8px 16px',
-                            backgroundColor: 'rgba(249, 250, 251, 0.8)',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(229, 231, 235, 0.6)',
-                            backdropFilter: 'blur(8px)'
-                        }}>
-                            <ImageIcon size={16} color="#6b7280" />
-                            <span style={{
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: '#4b5563'
-                            }}>
-                                {totalImages} high-quality images
-                            </span>
-                        </div>
-
-                        {productsWithMultipleImages > 0 && (
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '8px 16px',
-                                backgroundColor: 'rgba(184, 134, 11, 0.1)',
-                                borderRadius: '12px',
-                                border: '1px solid rgba(184, 134, 11, 0.2)',
-                                backdropFilter: 'blur(8px)'
-                            }}>
-                                <Sparkles size={16} color="#b8860b" />
-                                <span style={{
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    color: '#b8860b'
-                                }}>
-                                    {productsWithMultipleImages} products with multiple views
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                )}
 
                 {/* Decorative Elements */}
                 <div style={{
@@ -294,7 +241,7 @@ const RelatedProducts = ({ category, products }) => {
                         fontWeight: '600',
                         color: '#4b5563'
                     }}>
-                        {related.length} premium {category} pieces
+                        {related.length} exclusive {category} pieces
                     </span>
                 </div>
             </div>
@@ -345,57 +292,7 @@ const RelatedProducts = ({ category, products }) => {
                                 }}
                                 onClick={() => navigate(`/product/${item._id}`)} // Add navigation on click
                             >
-                                {/* Multiple Images Indicator */}
-                                {item.hasMultipleImages && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '12px',
-                                        right: '12px',
-                                        zIndex: 10,
-                                        background: 'rgba(255, 255, 255, 0.95)',
-                                        borderRadius: '20px',
-                                        padding: '6px 12px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        border: '1px solid rgba(184, 134, 11, 0.3)',
-                                        backdropFilter: 'blur(4px)',
-                                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                                    }}>
-                                        <ImageIcon size={14} color="#b8860b" />
-                                        <span style={{
-                                            fontSize: '12px',
-                                            fontWeight: '600',
-                                            color: '#b8860b'
-                                        }}>
-                                            {item.imageCount} views
-                                        </span>
-                                    </div>
-                                )}
 
-                                {/* Image Quality Indicator */}
-                                {item.imageCount > 0 && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '12px',
-                                        left: '12px',
-                                        zIndex: 10,
-                                        background: 'rgba(255, 255, 255, 0.95)',
-                                        borderRadius: '6px',
-                                        padding: '4px 8px',
-                                        border: '1px solid rgba(229, 231, 235, 0.5)',
-                                        backdropFilter: 'blur(4px)'
-                                    }}>
-                                        <span style={{
-                                            fontSize: '11px',
-                                            fontWeight: '600',
-                                            color: item.imageCount >= 3 ? '#10b981' : '#6b7280',
-                                            letterSpacing: '0.5px'
-                                        }}>
-                                            {item.imageCount >= 3 ? '📸 Multi-angle' : '📷 Single view'}
-                                        </span>
-                                    </div>
-                                )}
 
                                 <ProductItem
                                     id={item._id}
@@ -443,65 +340,6 @@ const RelatedProducts = ({ category, products }) => {
                         alignItems: 'center',
                         gap: '16px'
                     }}>
-                        {/* Image Quality Summary */}
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '12px',
-                            marginBottom: '8px',
-                            flexWrap: 'wrap'
-                        }}>
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                padding: '6px 12px',
-                                backgroundColor: 'rgba(249, 250, 251, 0.8)',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(229, 231, 235, 0.6)'
-                            }}>
-                                <div style={{
-                                    width: '8px',
-                                    height: '8px',
-                                    borderRadius: '50%',
-                                    backgroundColor: '#10b981'
-                                }}></div>
-                                <span style={{
-                                    fontSize: '14px',
-                                    color: '#6b7280'
-                                }}>
-                                    High-resolution images
-                                </span>
-                            </div>
-
-                            {productsWithMultipleImages > 0 && (
-                                <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    padding: '6px 12px',
-                                    backgroundColor: 'rgba(184, 134, 11, 0.1)',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(184, 134, 11, 0.2)'
-                                }}>
-                                    <div style={{
-                                        width: '8px',
-                                        height: '8px',
-                                        borderRadius: '50%',
-                                        backgroundColor: '#b8860b',
-                                        animation: 'pulse 2s infinite'
-                                    }}></div>
-                                    <span style={{
-                                        fontSize: '14px',
-                                        color: '#b8860b',
-                                        fontWeight: '600'
-                                    }}>
-                                        {productsWithMultipleImages} products with 360° views
-                                    </span>
-                                </div>
-                            )}
-                        </div>
 
                         <p style={{
                             fontSize: '16px',
@@ -609,7 +447,7 @@ const RelatedProducts = ({ category, products }) => {
                                     fontSize: '14px',
                                     color: '#6b7280'
                                 }}>
-                                    Premium Quality
+                                    Certified Hallmarked
                                 </span>
                             </div>
                             <div style={{

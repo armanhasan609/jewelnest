@@ -21,8 +21,8 @@ const LatestCollection = () => {
 
     return (
         <section className="latest-collection-section" style={{
-            padding: '4rem 1rem',
-            background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)',
+            padding: '6rem 1rem',
+            background: 'linear-gradient(180deg, #f5f2e8 0%, #eaddc0 100%)',
             position: 'relative',
             overflow: 'hidden'
         }}>

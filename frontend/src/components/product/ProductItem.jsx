@@ -494,65 +494,67 @@ const ProductItem = ({
 
             {/* CSS Animations */}
             <style>{`
-                @keyframes fadeInUp {
+@keyframes fadeInUp {
                     from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
+        opacity: 0;
+        transform: translateY(20px);
+    }
                     to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes loading {
+    0 % { background- position: 200 % 0;
+}
+100 % { background- position: -200 % 0; }
                 }
 
-                @keyframes loading {
-                    0% { background-position: 200% 0; }
-                    100% { background-position: -200% 0; }
+@keyframes spin {
+    0 % { transform: rotate(0deg); }
+    100 % { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0 %, 100 % { transform: scale(1); }
+    50 % { transform: scale(1.05); }
+}
+
+@keyframes bounce {
+    0 %, 100 % { transform: translateY(0); }
+    50 % { transform: translateY(-5px); }
+}
+
+@keyframes cartPulse {
+    0 %, 100 % { transform: scale(1); box- shadow: 8px 8px 16px #d1d9e6, -8px - 8px 16px #ffffff;
+}
+50 % { transform: scale(1.2); box- shadow: 0 0 30px rgba(102, 126, 234, 0.6); }
                 }
 
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
-                }
-
-                @keyframes bounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-5px); }
-                }
-
-                @keyframes cartPulse {
-                    0%, 100% { transform: scale(1); box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff; }
-                    50% { transform: scale(1.2); box-shadow: 0 0 30px rgba(102, 126, 234, 0.6); }
-                }
-
-                @keyframes fadeIn {
+@keyframes fadeIn {
                     from { opacity: 0; }
                     to { opacity: 1; }
-                }
+}
 
-                @keyframes slideInUp {
+@keyframes slideInUp {
                     from {
-                        opacity: 0;
-                        transform: translateY(30px) scale(0.95);
-                    }
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
                     to {
-                        opacity: 1;
-                        transform: translateY(0) scale(1);
-                    }
-                }
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
-                /* Smooth focus styles */
-                button:focus, a:focus {
-                    outline: 2px solid rgba(102, 126, 234, 0.5);
-                    outline-offset: 2px;
-                    border-radius: 20px;
-                }
-            `}</style>
+/* Smooth focus styles */
+button: focus, a:focus {
+    outline: 2px solid rgba(102, 126, 234, 0.5);
+    outline - offset: 2px;
+    border - radius: 20px;
+}
+`}</style>
         </div>
     );
 };

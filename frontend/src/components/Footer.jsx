@@ -33,7 +33,7 @@ const Footer = () => {
         },
         {
             icon: <Gem size={24} />,
-            title: 'Premium Quality',
+            title: 'High Quality',
             sub: 'Certified Pure Metals',
             color: '#b8860b'
         },
@@ -137,7 +137,7 @@ const Footer = () => {
                             fontFamily: "'Playfair Display', serif",
                             lineHeight: '1.2'
                         }}>
-                            Premium Experience,<br />Uncompromised Quality
+                            Exclusive Experience,<br />Uncompromised Quality
                         </h2>
                         <p style={{
                             fontSize: '16px',
@@ -320,7 +320,7 @@ const Footer = () => {
                             marginBottom: '32px',
                             maxWidth: '300px'
                         }}>
-                            Crafting timeless elegance with ethically sourced, premium quality jewelry that tells your unique story.
+                            Crafting timeless elegance with ethically sourced, high-quality jewelry that tells your unique story.
                         </p>
 
                         <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>

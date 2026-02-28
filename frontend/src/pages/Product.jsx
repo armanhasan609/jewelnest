@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
-import { Star, Check, Truck, Shield, Clock, Package, Sparkles, Gem, Crown, ShoppingBag } from 'lucide-react';
+import { Star, Check, Truck, Shield, Clock, Package, Sparkles, Gem, Crown, ShoppingBag, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import RelatedProducts from '../components/product/RelatedProducts';
@@ -300,7 +300,7 @@ const Product = () => {
                         textTransform: 'uppercase',
                         margin: 0
                     }}>
-                        Premium Collection
+                        Exclusive Collection
                     </h1>
                 </div>
 
@@ -338,25 +338,6 @@ const Product = () => {
                                     e.target.style.transform = 'scale(1)';
                                 }}
                             />
-                            {/* Premium Badge */}
-                            <div style={{
-                                position: 'absolute',
-                                top: '20px',
-                                left: '20px',
-                                background: 'linear-gradient(45deg, #b8860b, #fbbf24)',
-                                color: 'white',
-                                padding: '8px 16px',
-                                borderRadius: '20px',
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                letterSpacing: '1px'
-                            }}>
-                                <Crown size={14} />
-                                Premium
-                            </div>
                         </div>
 
                         {/* Image Thumbnails */}
@@ -719,7 +700,7 @@ const Product = () => {
                             </h3>
                             <div className="features-grid">
                                 {[
-                                    { icon: Gem, label: 'Premium Quality', desc: '100% Authentic Materials' },
+                                    { icon: Gem, label: 'High Quality', desc: '100% Authentic Materials' },
                                     { icon: Shield, label: 'Secure Payment', desc: 'SSL Encrypted Checkout' },
                                     { icon: Truck, label: 'Free Shipping', desc: '3-5 Business Days' }
                                 ].map((feature, index) => (
@@ -928,52 +909,176 @@ const Product = () => {
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                        backdropFilter: 'blur(10px)',
                         zIndex: 9999,
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        cursor: 'zoom-out',
                         animation: 'fadeIn 0.3s ease'
                     }}
                     onClick={() => setIsImageZoomed(false)}
                 >
-                    <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+                    {/* Close Button */}
+                    <button
+                        onClick={() => setIsImageZoomed(false)}
+                        style={{
+                            position: 'absolute',
+                            top: '30px',
+                            right: '30px',
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            color: 'white',
+                            cursor: 'pointer',
+                            padding: '12px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.3s ease',
+                            zIndex: 10001
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                            e.currentTarget.style.transform = 'rotate(90deg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                            e.currentTarget.style.transform = 'rotate(0deg)';
+                        }}
+                    >
+                        <X size={24} />
+                    </button>
+
+                    {/* Navigation Arrows */}
+                    {productImages.length > 1 && (
+                        <>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedImage((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    left: '40px',
+                                    background: 'rgba(255, 255, 255, 0.1)',
+                                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    padding: '16px',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.3s ease',
+                                    zIndex: 10000
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+                            >
+                                <ChevronLeft size={32} />
+                            </button>
+
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedImage((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    right: '40px',
+                                    background: 'rgba(255, 255, 255, 0.1)',
+                                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    padding: '16px',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.3s ease',
+                                    zIndex: 10000
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+                            >
+                                <ChevronRight size={32} />
+                            </button>
+                        </>
+                    )}
+
+                    {/* Main Enlarged Image */}
+                    <div
+                        style={{
+                            position: 'relative',
+                            maxWidth: '85vw',
+                            maxHeight: '75vh',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <img
                             src={productImages[selectedImage] || productImages[0]}
                             alt={productData.name}
                             style={{
                                 maxWidth: '100%',
-                                maxHeight: '90vh',
+                                maxHeight: '75vh',
                                 objectFit: 'contain',
-                                borderRadius: '8px',
-                                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                                cursor: 'default'
+                                borderRadius: '16px',
+                                boxShadow: '0 30px 60px rgba(0, 0, 0, 0.5)',
+                                animation: 'scaleUp 0.3s ease-out'
+                            }}
+                        />
+                    </div>
+
+                    {/* Modal Thumbnails */}
+                    {productImages.length > 1 && (
+                        <div
+                            style={{
+                                display: 'flex',
+                                gap: '12px',
+                                marginTop: '40px',
+                                padding: '10px 20px',
+                                background: 'rgba(255, 255, 255, 0.05)',
+                                borderRadius: '20px',
+                                backdropFilter: 'blur(10px)',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                zIndex: 10000
                             }}
                             onClick={(e) => e.stopPropagation()}
-                        />
-                        <button
-                            onClick={() => setIsImageZoomed(false)}
-                            style={{
-                                position: 'absolute',
-                                top: '-40px',
-                                right: '-40px',
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'white',
-                                cursor: 'pointer',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
                         >
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
+                            {productImages.map((img, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setSelectedImage(index)}
+                                    style={{
+                                        width: '60px',
+                                        height: '60px',
+                                        borderRadius: '10px',
+                                        overflow: 'hidden',
+                                        border: `2px solid ${selectedImage === index ? '#fbbf24' : 'transparent'}`,
+                                        background: 'none',
+                                        cursor: 'pointer',
+                                        padding: '0',
+                                        transition: 'all 0.3s ease',
+                                        opacity: selectedImage === index ? 1 : 0.6
+                                    }}
+                                >
+                                    <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    <style>{`
+                        @keyframes scaleUp {
+                            from { transform: scale(0.9); opacity: 0; }
+                            to { transform: scale(1); opacity: 1; }
+                        }
+                    `}</style>
                 </div>
             )}
 
