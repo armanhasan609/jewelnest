@@ -33,7 +33,6 @@ const Collection = () => {
         if (!mobileSearchQuery.trim()) return;
         setSearch(mobileSearchQuery);
         setShowSearch(true);
-        setMobileSearchQuery('');
     };
 
     const handleMobileSearchKeyDown = (e) => {
@@ -205,30 +204,94 @@ const Collection = () => {
                     box-shadow: 0 25px 50px -12px rgba(184, 134, 11, 0.25);
                 }
 
-                /* Responsive Design */
+                /* Responsive Design & Search Bar */
+                .collection-search-bar {
+                    display: flex;
+                    justify-content: center;
+                    padding: 40px 24px;
+                    background: rgba(255, 255, 255, 0.9);
+                    backdrop-filter: blur(8px);
+                    width: 100%;
+                    animation: fadeIn 0.8s ease-out;
+                    box-sizing: border-box;
+                    z-index: 95;
+                    transition: all 0.3s ease;
+                    border-bottom: 1px solid rgba(184, 134, 11, 0.05);
+                }
+
+                .search-inner-container {
+                    display: flex;
+                    align-items: center;
+                    background: white;
+                    border-radius: 50px;
+                    padding: 6px 6px 6px 18px;
+                    border: 1px solid rgba(184, 134, 11, 0.15);
+                    box-shadow: 0 8px 25px rgba(184, 134, 11, 0.08);
+                    width: 100%;
+                    max-width: 650px;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    margin: 0 auto !important;
+                }
+
+                .search-inner-container:focus-within {
+                    border-color: #b8860b;
+                    box-shadow: 0 10px 30px rgba(184, 134, 11, 0.15);
+                    transform: translateY(-2px);
+                }
+
+                .search-btn {
+                    background: linear-gradient(45deg, #b8860b, #d4a017);
+                    color: white !important;
+                    border: none;
+                    border-radius: 50px;
+                    padding: 12px 28px;
+                    font-size: 15px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(184, 134, 11, 0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    white-space: nowrap;
+                    flex-shrink: 0;
+                }
+
+                .search-btn:hover {
+                    opacity: 0.9;
+                    box-shadow: 0 6px 15px rgba(184, 134, 11, 0.3);
+                }
+
+                .search-btn-icon-only {
+                    display: none !important;
+                }
+
                 @media (max-width: 1024px) {
                     .collection-layout {
                         flex-direction: column;
                         padding: 24px !important;
                     }
-                    .mobile-search-bar { display: block !important; }
+                    .collection-search-bar {
+                        padding: 20px;
+                    }
                 }
 
                 @media (max-width: 768px) {
-                    .mobile-search-bar { 
-                        display: block !important;
-                        position: sticky;
+                    .collection-search-bar { 
+                        position: relative;
                         top: 0;
-                        z-index: 95;
                         background: rgba(255, 255, 255, 0.95);
                         backdrop-filter: blur(12px);
-                        padding: 16px 20px !important;
+                        padding: 12px 16px !important;
+                        border-bottom: 1px solid rgba(184, 134, 11, 0.1);
+                        margin-bottom: 0px;
                     }
 
                     .mobile-category-strip {
                         display: flex !important;
-                        position: sticky;
-                        top: 76px;
+                        position: relative;
+                        top: 0;
                         background: rgba(255, 255, 255, 0.9);
                         backdrop-filter: blur(10px);
                         border-bottom: 1px solid rgba(184, 134, 11, 0.1);
@@ -236,13 +299,11 @@ const Collection = () => {
                         padding: 12px 0;
                         overflow-x: auto;
                         scrollbar-width: none;
-                        -ms-overflow-style: none;
                     }
-                    .mobile-category-strip::-webkit-scrollbar { display: none; }
 
                     .collection-layout {
                         margin-left: 0 !important;
-                        padding: 20px !important;
+                        padding: 16px !important;
                         gap: 24px !important;
                     }
 
@@ -252,13 +313,11 @@ const Collection = () => {
                         top: 0 !important;
                         bottom: 0 !important;
                         height: 100vh !important;
-                        width: 100% !important;
+                        width: 90% !important;
                         max-width: 320px !important;
                         z-index: 1001 !important;
-                        border-radius: 0 32px 32px 0 !important;
                         transform: translateX(-100%);
-                        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                        display: block !important;
+                        transition: transform 0.4s ease !important;
                     }
 
                     .filter-sidebar.is-open {
@@ -266,22 +325,9 @@ const Collection = () => {
                         box-shadow: 20px 0 60px rgba(0,0,0,0.2) !important;
                     }
 
-                    .filter-open-btn { display: flex !important; }
-                    
-                    .result-text { 
-                        text-align: center;
-                        justify-content: center;
-                        width: 100%;
-                    }
-
                     .product-grid {
                         grid-template-columns: repeat(2, 1fr) !important;
-                        gap: 16px !important;
-                    }
-
-                    .mobile-sort-select {
-                        min-width: unset !important;
-                        width: 100%;
+                        gap: 12px !important;
                     }
 
                     header {
@@ -289,17 +335,51 @@ const Collection = () => {
                     }
                 }
 
-                @media (max-width: 480px) {
+                @media (max-width: 600px) {
+                    .search-btn-text { display: none !important; }
+                    .search-btn-icon-only { 
+                        display: block !important; 
+                        margin: 0 !important;
+                    }
+                    .search-btn {
+                        padding: 0 !important;
+                        border-radius: 50% !important;
+                        width: 44px !important;
+                        height: 44px !important;
+                        min-width: 44px !important;
+                    }
+                    .search-inner-container {
+                        padding-left: 14px !important;
+                    }
+                }
+
+                @media (min-width: 769px) {
+                    .filter-open-btn, .filter-close-btn { display: none !important; }
+                    .mobile-category-strip { 
+                        display: flex !important;
+                        position: relative;
+                        top: 0;
+                        z-index: 90;
+                        background: rgba(255, 255, 255, 0.8);
+                        backdrop-filter: blur(8px);
+                        padding: 10px 0;
+                        border-bottom: 1px solid rgba(184, 134, 11, 0.05);
+                    }
+                    .filter-sidebar { transform: translateX(0) !important; position: sticky !important; top: 100px !important; }
+                }
+
+                @media (max-width: 540px) {
                     .product-grid {
-                        grid-template-columns: repeat(2, 1fr) !important;
-                        gap: 12px !important;
+                        grid-template-columns: 1fr !important;
+                        gap: 24px !important;
                     }
 
                     .collection-layout {
-                        padding: 16px !important;
+                        padding: 12px !important;
+                        gap: 16px !important;
                     }
 
-                    h1 { font-size: 2.5rem !important; }
+                    h1 { font-size: 2.2rem !important; }
                 }
 
                 @media (min-width: 769px) {
@@ -439,30 +519,14 @@ const Collection = () => {
                 </div>
             </header>
 
-            {/* Mobile Search Bar */}
-            <div className="mobile-search-bar" style={{
-                display: 'none',
-                padding: '16px 20px',
-                background: 'rgba(255, 255, 255, 0.8)',
-                backdropFilter: 'blur(12px)',
-                borderBottom: '1px solid rgba(184, 134, 11, 0.08)',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)'
-            }}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: 'white',
-                    borderRadius: '50px',
-                    padding: '6px 6px 6px 18px',
-                    border: '1px solid rgba(184, 134, 11, 0.15)',
-                    boxShadow: '0 8px 20px rgba(184, 134, 11, 0.06)',
-                    maxWidth: '100%',
-                    margin: '0 auto',
-                }}>
-                    <Search size={18} style={{ color: '#b8860b', flexShrink: 0 }} />
+            {/* Search Bar Section */}
+            <div className="collection-search-bar">
+                <div className="search-inner-container">
+                    <Search size={20} style={{ color: '#b8860b', flexShrink: 0 }} />
                     <input
                         type="text"
-                        placeholder="Search our treasures..."
+                        className="search-input-field"
+                        placeholder="Search our magnificent treasures..."
                         value={mobileSearchQuery}
                         onChange={(e) => setMobileSearchQuery(e.target.value)}
                         onKeyDown={handleMobileSearchKeyDown}
@@ -471,39 +535,33 @@ const Collection = () => {
                             background: 'transparent',
                             border: 'none',
                             outline: 'none',
-                            fontSize: '15px',
+                            fontSize: '16px',
                             fontWeight: '500',
                             color: '#1a202c',
-                            padding: '10px 12px',
+                            padding: '12px 14px',
                         }}
                     />
                     {mobileSearchQuery && (
-                        <X
-                            size={18}
+                        <div
+                            onClick={() => { setMobileSearchQuery(''); setSearch(''); setShowSearch(false); }}
                             style={{
                                 color: '#9ca3af',
                                 cursor: 'pointer',
-                                padding: '4px',
-                                marginRight: '8px'
+                                padding: '8px',
+                                marginRight: '4px',
+                                display: 'flex',
+                                alignItems: 'center'
                             }}
-                            onClick={() => setMobileSearchQuery('')}
-                        />
+                        >
+                            <X size={18} />
+                        </div>
                     )}
                     <button
                         onClick={handleMobileSearch}
-                        style={{
-                            background: 'linear-gradient(45deg, #b8860b, #d4a017)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '50px',
-                            padding: '10px 20px',
-                            fontSize: '14px',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(184, 134, 11, 0.2)'
-                        }}
+                        className="search-btn"
                     >
-                        Search
+                        <span className="search-btn-text">Search</span>
+                        <Search size={20} className="search-btn-icon-only" />
                     </button>
                 </div>
             </div>
@@ -574,7 +632,7 @@ const Collection = () => {
                         boxShadow: '0 20px 40px -20px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(184, 134, 11, 0.08) inset',
                         height: 'fit-content',
                         position: 'sticky',
-                        top: '40px',
+                        top: '100px',
                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                         border: '1px solid rgba(255, 255, 255, 0.5)'
                     }}
@@ -753,6 +811,7 @@ const Collection = () => {
                                         appearance: 'none',
                                         outline: 'none',
                                         transition: 'all 0.3s ease'
+
                                     }}
                                 >
                                     <option value="relevant">✨ Most Relevant</option>
@@ -945,7 +1004,9 @@ const Collection = () => {
                                 width: '60px',
                                 height: '60px',
                                 margin: '0 auto 24px',
-                                border: '4px solid rgba(184, 134, 11, 0.1)',
+                                borderWidth: '4px',
+                                borderStyle: 'solid',
+                                borderColor: 'rgba(184, 134, 11, 0.1)',
                                 borderTopColor: '#b8860b',
                                 borderRadius: '50%',
                                 animation: 'spin 1s linear infinite'
