@@ -24,14 +24,29 @@ const Cart = () => {
         window.scrollTo(0, 0);
     }, []);
 
-    // 2. Optimized Cart Data Sync (Removed 500ms delay)
+    // 2. Optimized Cart Data Sync - handles both variant (object) and non-variant (number) entries
     useEffect(() => {
         const tempData = [];
-        for (const items in cartItems) {
-            if (cartItems[items] > 0) {
+        for (const key in cartItems) {
+            const entry = cartItems[key];
+            if (typeof entry === 'object' && entry.quantity > 0) {
+                // Variant item
                 tempData.push({
-                    _id: items,
-                    quantity: cartItems[items]
+                    _id: key,
+                    productId: entry.productId,
+                    quantity: entry.quantity,
+                    selectedColor: entry.selectedColor,
+                    selectedSize: entry.selectedSize,
+                    variantImage: entry.variantImage,
+                    variantSku: entry.variantSku,
+                    priceAdjustment: entry.priceAdjustment || 0
+                });
+            } else if (typeof entry === 'number' && entry > 0) {
+                // Non-variant item (legacy)
+                tempData.push({
+                    _id: key,
+                    productId: key,
+                    quantity: entry
                 });
             }
         }
@@ -74,22 +89,25 @@ const Cart = () => {
 
     const shippingFee = getCartAmount() > 499 ? 0 : 50;
 
-    // 3. Helper to get the correct Image URL
-    const resolveImageSrc = (product) => {
+    // 3. Helper to get the correct Image URL (variant-aware)
+    const resolveImageSrc = (product, item) => {
+        // Priority 0: Variant image from cart entry
+        if (item?.variantImage) return item.variantImage;
+
         if (!product) return '';
 
-        // Priority 1: Check 'images' array (New multiple images format)
+        // Priority 1: Check 'images' array
         if (product.images && product.images.length > 0) {
             const firstImg = product.images[0];
             return typeof firstImg === 'object' ? firstImg.url : firstImg;
         }
 
-        // Priority 2: Check 'image' string/array (Old format)
+        // Priority 2: Check 'image' string/array
         if (product.image) {
             return Array.isArray(product.image) ? product.image[0] : product.image;
         }
 
-        return 'https://placehold.co/150'; // Default fallback
+        return 'https://placehold.co/150';
     };
 
     // Loading State
@@ -218,10 +236,12 @@ const Cart = () => {
                 {/* Product List */}
                 <div className="cart-items-list">
                     {cartData.map((item, index) => {
-                        const productData = products.find(p => p._id === item._id);
+                        const productData = products.find(p => p._id === (item.productId || item._id));
                         if (!productData) return null;
 
-                        const currentPrice = getProductCurrentPrice ? getProductCurrentPrice(productData) : (productData.price || 0);
+                        const basePrice = getProductCurrentPrice ? getProductCurrentPrice(productData) : (productData.price || 0);
+                        const priceAdj = item.priceAdjustment || 0;
+                        const currentPrice = basePrice + priceAdj;
                         const originalPrice = productData.price || 0;
                         const isSale = currentPrice < originalPrice;
                         const stock = productData.stock || 10;
@@ -237,7 +257,7 @@ const Cart = () => {
                             >
                                 <div className="cart-item-image-wrapper">
                                     <img
-                                        src={resolveImageSrc(productData)}
+                                        src={resolveImageSrc(productData, item)}
                                         className="cart-item-image"
                                         alt={productData.name}
                                     />
@@ -248,6 +268,38 @@ const Cart = () => {
 
                                 <div className="cart-item-details">
                                     <h3 className="product-name">{productData.name}</h3>
+
+                                    {/* Variant Info Badges */}
+                                    {(item.selectedColor || item.selectedSize) && (
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                            {item.selectedColor && (
+                                                <span style={{
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600',
+                                                    color: '#92400e',
+                                                    background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                                                    padding: '4px 10px',
+                                                    borderRadius: '20px',
+                                                    border: '1px solid #fbbf24'
+                                                }}>
+                                                    🎨 {item.selectedColor}
+                                                </span>
+                                            )}
+                                            {item.selectedSize && (
+                                                <span style={{
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600',
+                                                    color: '#1e40af',
+                                                    background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)',
+                                                    padding: '4px 10px',
+                                                    borderRadius: '20px',
+                                                    border: '1px solid #93c5fd'
+                                                }}>
+                                                    📐 Size: {item.selectedSize}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
 
                                     <div className="product-price-container">
                                         <span className="current-price">
@@ -267,7 +319,7 @@ const Cart = () => {
                                     </div>
 
                                     <p className="product-meta">
-                                        SKU: {productData.sku}
+                                        SKU: {item.variantSku || productData.sku}
                                     </p>
                                     <p style={{
                                         fontSize: '0.875rem',

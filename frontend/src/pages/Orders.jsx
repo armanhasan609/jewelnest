@@ -11,7 +11,7 @@ const Orders = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [modalAnimation, setModalAnimation] = useState('enter');
 
-    const { backendUrl, token, currency } = useContext(ShopContext);
+    const { backendUrl, token, currency, products } = useContext(ShopContext);
 
     const fetchUserOrders = async () => {
         try {
@@ -474,7 +474,7 @@ const Orders = () => {
                                         </div>
 
                                         {/* Order Items */}
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                             {order.items.map((item, i) => {
                                                 // Quantity is already normalized in fetchUserOrders
                                                 const itemQty = item.quantity;
@@ -482,21 +482,99 @@ const Orders = () => {
                                                 const itemTotal = itemQty * itemPrice;
 
                                                 return (
-                                                    <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'center', background: '#f9fafb', padding: '0.75rem', borderRadius: '0.5rem' }}>
+                                                    <div key={i} style={{
+                                                        display: 'flex',
+                                                        gap: '1rem',
+                                                        alignItems: 'center',
+                                                        background: '#f9fafb',
+                                                        padding: '0.875rem',
+                                                        borderRadius: '0.75rem',
+                                                        border: '1px solid #f3f4f6'
+                                                    }}>
                                                         <img
-                                                            src={getPrimaryImage(item)}
+                                                            src={item.variantImage || getPrimaryImage(item)}
                                                             alt={item.name || 'Product'}
-                                                            style={{ width: '4rem', height: '4rem', objectFit: 'cover', borderRadius: '0.375rem', border: '1px solid #e5e7eb' }}
+                                                            style={{
+                                                                width: '5rem',
+                                                                height: '5rem',
+                                                                objectFit: 'cover',
+                                                                borderRadius: '0.5rem',
+                                                                border: '1px solid #e5e7eb',
+                                                                flexShrink: 0
+                                                            }}
                                                             onError={(e) => { e.currentTarget.src = "https://placehold.co/64"; }}
                                                         />
-                                                        <div style={{ flex: 1 }}>
-                                                            <p style={{ fontWeight: '600', color: '#374151', fontSize: '0.95rem' }}>{item.name}</p>
-                                                            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.25rem', fontSize: '0.85rem', color: '#6b7280' }}>
-                                                                <span>Qty: {itemQty}</span>
-                                                                <span>Price: {currency}{itemPrice.toLocaleString()}</span>
+                                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                                            {/* Product Name */}
+                                                            <p style={{
+                                                                fontWeight: '700',
+                                                                color: '#1f2937',
+                                                                fontSize: '1rem',
+                                                                marginBottom: '4px',
+                                                                lineHeight: '1.3',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                whiteSpace: 'nowrap'
+                                                            }}>
+                                                                {item.name || (products.find(p => p._id === (item.productId?._id || item.productId))?.name) || 'Unnamed Product'}
+                                                            </p>
+
+                                                            {/* Variant Info (Color & Size) */}
+                                                            {(item.selectedColor || item.selectedSize || item.color || item.size) && (
+                                                                <div style={{
+                                                                    display: 'flex',
+                                                                    gap: '6px',
+                                                                    flexWrap: 'wrap',
+                                                                    marginBottom: '4px'
+                                                                }}>
+                                                                    {(item.selectedColor || item.color) && (
+                                                                        <span style={{
+                                                                            fontSize: '0.7rem',
+                                                                            fontWeight: '600',
+                                                                            color: '#7c3aed',
+                                                                            background: '#ede9fe',
+                                                                            padding: '2px 8px',
+                                                                            borderRadius: '10px'
+                                                                        }}>
+                                                                            🎨 {item.selectedColor || item.color}
+                                                                        </span>
+                                                                    )}
+                                                                    {(item.selectedSize || item.size) && (
+                                                                        <span style={{
+                                                                            fontSize: '0.7rem',
+                                                                            fontWeight: '600',
+                                                                            color: '#0369a1',
+                                                                            background: '#e0f2fe',
+                                                                            padding: '2px 8px',
+                                                                            borderRadius: '10px'
+                                                                        }}>
+                                                                            📐 {item.selectedSize || item.size}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            )}
+
+                                                            {/* Qty × Price */}
+                                                            <div style={{
+                                                                display: 'flex',
+                                                                gap: '0.75rem',
+                                                                fontSize: '0.8rem',
+                                                                color: '#6b7280'
+                                                            }}>
+                                                                <span>Qty: <strong style={{ color: '#374151' }}>{itemQty}</strong></span>
+                                                                <span>×</span>
+                                                                <span>{currency}{itemPrice.toLocaleString()}</span>
                                                             </div>
                                                         </div>
-                                                        <div style={{ fontWeight: '700', color: '#111827' }}>
+
+                                                        {/* Item Total */}
+                                                        <div style={{
+                                                            fontWeight: '800',
+                                                            color: '#111827',
+                                                            fontSize: '1rem',
+                                                            whiteSpace: 'nowrap',
+                                                            flexShrink: 0
+                                                        }}>
                                                             {currency}{itemTotal.toLocaleString()}
                                                         </div>
                                                     </div>

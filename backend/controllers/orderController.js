@@ -35,23 +35,45 @@ const createOrder = async (req, res) => {
         });
 
         // 1. Validate all stock availability FIRST before decrementing
-        // This prevents partial updates if item 3 fails but item 1 was updated
         for (const item of sanitizedItems) {
             const product = await Product.findById(item.productId);
             if (!product) {
                 return res.status(404).json({ success: false, message: `Product not found: ${item.name}` });
             }
-            if (product.stock < item.quantity) {
-                return res.status(400).json({ success: false, message: `Insufficient stock for: ${item.name}` });
+
+            // Variant-aware stock check
+            if (product.hasVariants && item.selectedColor && item.selectedSize) {
+                const variant = product.variants.find(v => v.color === item.selectedColor);
+                if (!variant) {
+                    return res.status(400).json({ success: false, message: `Variant color "${item.selectedColor}" not found for: ${item.name}` });
+                }
+                const sizeEntry = variant.sizes.find(s => s.size === item.selectedSize);
+                if (!sizeEntry || sizeEntry.stock < item.quantity) {
+                    return res.status(400).json({ success: false, message: `Insufficient stock for: ${item.name} (${item.selectedColor}, Size: ${item.selectedSize})` });
+                }
+            } else {
+                if (product.stock < item.quantity) {
+                    return res.status(400).json({ success: false, message: `Insufficient stock for: ${item.name}` });
+                }
             }
         }
 
-        // 2. Decrement Stock Atomic Update
+        // 2. Decrement Stock (variant-aware)
         for (const item of sanitizedItems) {
-            await Product.findByIdAndUpdate(
-                item.productId,
-                { $inc: { stock: -item.quantity } }
-            );
+            const product = await Product.findById(item.productId);
+            if (product.hasVariants && item.selectedColor && item.selectedSize) {
+                // Decrement variant-level stock
+                await Product.updateOne(
+                    { _id: item.productId, 'variants.color': item.selectedColor, 'variants.sizes.size': item.selectedSize },
+                    { $inc: { 'variants.$[v].sizes.$[s].stock': -item.quantity, stock: -item.quantity } },
+                    { arrayFilters: [{ 'v.color': item.selectedColor }, { 's.size': item.selectedSize }] }
+                );
+            } else {
+                await Product.findByIdAndUpdate(
+                    item.productId,
+                    { $inc: { stock: -item.quantity } }
+                );
+            }
         }
 
         // Normalize items with Simplified Image Logic
@@ -92,14 +114,19 @@ const createOrder = async (req, res) => {
                 name: item.name,
                 sku: item.sku || '',
                 price: safePrice,
-                quantity: item.quantity, // Use the sanitized quantity
-                image: finalImage,       // Single string URL
-                images: finalImagesArray, // Array format
+                quantity: item.quantity,
+                image: item.variantImage || finalImage,
+                images: finalImagesArray,
                 category: item.category || 'Uncategorized',
-                size: item.size || '',
-                color: item.color || '',
+                size: item.size || item.selectedSize || '',
+                color: item.color || item.selectedColor || '',
                 material: item.material || '',
-                weight: item.weight || ''
+                weight: item.weight || '',
+                // --- VARIANT DETAILS ---
+                selectedColor: item.selectedColor || '',
+                selectedSize: item.selectedSize || '',
+                variantSku: item.variantSku || '',
+                variantImage: item.variantImage || finalImage
             };
         });
 
@@ -159,16 +186,55 @@ const userOrders = async (req, res) => {
 
         const orders = await Order.find({ userId }).sort({ date: -1 });
 
-        // Format orders with proper image URLs
+        // Collect all unique productIds to batch-fetch product details
+        const allProductIds = new Set();
+        orders.forEach(order => {
+            order.items.forEach(item => {
+                if (item.productId) {
+                    allProductIds.add(item.productId.toString());
+                }
+            });
+        });
+
+        // Batch fetch product info (name + variants for color resolution)
+        let productMap = {};
+        if (allProductIds.size > 0) {
+            const products = await Product.find(
+                { _id: { $in: Array.from(allProductIds) } },
+                { name: 1, hasVariants: 1, variants: 1 }
+            );
+            products.forEach(p => {
+                productMap[p._id.toString()] = p;
+            });
+        }
+
+        // Format orders with proper image URLs, resolved names, and color/size
         const formattedOrders = orders.map(order => ({
             ...order.toObject(),
-            items: order.items.map(item => ({
-                ...item,
-                images: ensureImageUrls(item.images || []),
-                thumbnail: getThumbnailUrl(item.images?.[0] || item.image || ''),
-                price: item.price || 0,
-                total: (item.price || 0) * (item.quantity || 1)
-            }))
+            items: order.items.map(item => {
+                const pid = item.productId ? item.productId.toString() : null;
+                const product = pid ? productMap[pid] : null;
+
+                // Resolve name
+                const itemName = item.name || product?.name || 'Unknown Product';
+
+                // Resolve color and size — check both selectedColor and color fields
+                const itemColor = item.selectedColor || item.color || '';
+                const itemSize = item.selectedSize || item.size || '';
+
+                return {
+                    ...item,
+                    name: itemName,
+                    selectedColor: itemColor,
+                    selectedSize: itemSize,
+                    color: itemColor,
+                    size: itemSize,
+                    images: ensureImageUrls(item.images || []),
+                    thumbnail: getThumbnailUrl(item.images?.[0] || item.image || ''),
+                    price: item.price || 0,
+                    total: (item.price || 0) * (item.quantity || 1)
+                };
+            })
         }));
 
         res.json({ success: true, orders: formattedOrders });
@@ -746,13 +812,22 @@ const cancelOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: `Order already ${order.status}` });
         }
 
-        // Restore stock
+        // Restore stock (variant-aware)
         for (const item of order.items || []) {
             if (item.productId && item.quantity) {
-                await Product.findByIdAndUpdate(
-                    item.productId,
-                    { $inc: { stock: item.quantity } }
-                );
+                if (item.selectedColor && item.selectedSize) {
+                    // Restore variant-level stock
+                    await Product.updateOne(
+                        { _id: item.productId, 'variants.color': item.selectedColor, 'variants.sizes.size': item.selectedSize },
+                        { $inc: { 'variants.$[v].sizes.$[s].stock': item.quantity, stock: item.quantity } },
+                        { arrayFilters: [{ 'v.color': item.selectedColor }, { 's.size': item.selectedSize }] }
+                    );
+                } else {
+                    await Product.findByIdAndUpdate(
+                        item.productId,
+                        { $inc: { stock: item.quantity } }
+                    );
+                }
             }
         }
 

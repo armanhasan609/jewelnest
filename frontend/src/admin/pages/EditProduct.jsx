@@ -32,6 +32,11 @@ const EditProduct = () => {
     const [fetchLoading, setFetchLoading] = useState(true);
     const [compressing, setCompressing] = useState(false);
 
+    // --- VARIANT STATES ---
+    const [hasVariants, setHasVariants] = useState(false);
+    // Each variant: { color: '', existingImages: [{url, publicId}], newImages: [], compressedImages: [], sizes: [{ size: '', stock: 0, priceAdjustment: 0 }] }
+    const [variants, setVariants] = useState([]);
+
     // Fetch SubCategories on Mount
     useEffect(() => {
         const fetchSubCategories = async () => {
@@ -145,20 +150,37 @@ const EditProduct = () => {
                     setPrice(p.price);
                     setSalePrice(p.salePrice || "");
                     setStock(p.stock);
-                    // setCategory(p.category); // Removed
                     setSubCategory(p.subCategory);
                     setOnSale(p.onSale);
                     setBestseller(p.bestseller);
 
-                    // Set existing images array (your backend returns images as array)
+                    // Set existing images array
                     if (p.images && Array.isArray(p.images)) {
                         setExistingImages(p.images.map(img => ({
                             url: img.url,
                             publicId: img.publicId
                         })));
                     } else if (p.image) {
-                        // Fallback for single image (backward compatibility)
                         setExistingImages([{ url: p.image }]);
+                    }
+
+                    // Load variant data
+                    if (p.hasVariants && p.variants && p.variants.length > 0) {
+                        setHasVariants(true);
+                        setVariants(p.variants.map(v => ({
+                            color: v.color || '',
+                            existingImages: (v.images || []).map(img => ({
+                                url: typeof img === 'object' ? img.url : img,
+                                publicId: typeof img === 'object' ? img.publicId : ''
+                            })),
+                            newImages: [],
+                            compressedImages: [],
+                            sizes: (v.sizes || []).map(s => ({
+                                size: s.size || '',
+                                stock: s.stock || 0,
+                                priceAdjustment: s.priceAdjustment || 0
+                            }))
+                        })));
                     }
 
                     if (p.saleStartDate) setSaleStartDate(p.saleStartDate.split('T')[0]);
@@ -229,6 +251,102 @@ const EditProduct = () => {
         setExistingImages(prev => prev.filter((_, i) => i !== index));
     };
 
+    // --- VARIANT HELPER FUNCTIONS ---
+    const addVariant = () => {
+        setVariants(prev => [...prev, { color: '', existingImages: [], newImages: [], compressedImages: [], sizes: [{ size: '', stock: 0, priceAdjustment: 0 }] }]);
+    };
+
+    const removeVariant = (index) => {
+        setVariants(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const updateVariantColor = (index, value) => {
+        setVariants(prev => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], color: value };
+            return updated;
+        });
+    };
+
+    const handleVariantImageUpload = async (variantIndex, e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        const validFiles = files.filter(f => f.type.startsWith('image/') && f.size <= 10 * 1024 * 1024);
+        if (validFiles.length === 0) { toast.error('No valid images selected'); return; }
+
+        try {
+            const compressed = await Promise.all(validFiles.map(f => compressImage(f)));
+            setVariants(prev => {
+                const updated = [...prev];
+                updated[variantIndex] = {
+                    ...updated[variantIndex],
+                    newImages: [...updated[variantIndex].newImages, ...validFiles],
+                    compressedImages: [...updated[variantIndex].compressedImages, ...compressed]
+                };
+                return updated;
+            });
+            toast.success(`Added ${validFiles.length} image(s)`);
+        } catch (err) {
+            toast.error('Failed to compress images');
+        }
+    };
+
+    const removeVariantNewImage = (vIdx, imgIdx) => {
+        setVariants(prev => {
+            const updated = [...prev];
+            updated[vIdx] = {
+                ...updated[vIdx],
+                newImages: updated[vIdx].newImages.filter((_, i) => i !== imgIdx),
+                compressedImages: updated[vIdx].compressedImages.filter((_, i) => i !== imgIdx)
+            };
+            return updated;
+        });
+    };
+
+    const removeVariantExistingImage = (vIdx, imgIdx) => {
+        setVariants(prev => {
+            const updated = [...prev];
+            updated[vIdx] = {
+                ...updated[vIdx],
+                existingImages: updated[vIdx].existingImages.filter((_, i) => i !== imgIdx)
+            };
+            return updated;
+        });
+    };
+
+    const addSizeToVariant = (variantIndex) => {
+        setVariants(prev => {
+            const updated = [...prev];
+            updated[variantIndex] = {
+                ...updated[variantIndex],
+                sizes: [...updated[variantIndex].sizes, { size: '', stock: 0, priceAdjustment: 0 }]
+            };
+            return updated;
+        });
+    };
+
+    const removeSizeFromVariant = (variantIndex, sizeIndex) => {
+        setVariants(prev => {
+            const updated = [...prev];
+            updated[variantIndex] = {
+                ...updated[variantIndex],
+                sizes: updated[variantIndex].sizes.filter((_, i) => i !== sizeIndex)
+            };
+            return updated;
+        });
+    };
+
+    const updateVariantSize = (variantIndex, sizeIndex, field, value) => {
+        setVariants(prev => {
+            const updated = [...prev];
+            const newSizes = [...updated[variantIndex].sizes];
+            newSizes[sizeIndex] = { ...newSizes[sizeIndex], [field]: value };
+            updated[variantIndex] = { ...updated[variantIndex], sizes: newSizes };
+            return updated;
+        });
+    };
+
     const handleAddSubCategory = async () => {
         if (!newSubCategory.trim()) {
             return toast.error("Please enter a sub category name");
@@ -292,40 +410,35 @@ const EditProduct = () => {
         e.preventDefault();
 
         // Basic Validations
-        if (existingImages.length === 0 && images.length === 0) {
+        if (!hasVariants && existingImages.length === 0 && images.length === 0) {
             return toast.error("Please upload at least one product image!");
         }
-        if (!name.trim()) {
-            return toast.error("Product name is required!");
-        }
-        if (!description.trim()) {
-            return toast.error("Product description is required!");
-        }
-        if (!originalPrice || Number(originalPrice) <= 0) {
-            return toast.error("Valid MRP is required!");
-        }
-        if (!price || Number(price) <= 0) {
-            return toast.error("Valid Regular Price is required!");
-        }
-        if (Number(price) >= Number(originalPrice)) {
-            return toast.error("Regular Price must be less than MRP!");
-        }
+        if (!name.trim()) return toast.error("Product name is required!");
+        if (!description.trim()) return toast.error("Product description is required!");
+        if (!originalPrice || Number(originalPrice) <= 0) return toast.error("Valid MRP is required!");
+        if (!price || Number(price) <= 0) return toast.error("Valid Regular Price is required!");
+        if (Number(price) >= Number(originalPrice)) return toast.error("Regular Price must be less than MRP!");
         if (onSale) {
-            if (!salePrice || Number(salePrice) <= 0) {
-                return toast.error("Valid Sale Price is required when sale is active!");
-            }
-            if (Number(salePrice) >= Number(price)) {
-                return toast.error("Sale Price must be less than Regular Price!");
-            }
-            if (!saleStartDate || !saleEndDate) {
-                return toast.error("Sale start and end dates are required!");
-            }
-            if (new Date(saleEndDate) <= new Date(saleStartDate)) {
-                return toast.error("Sale end date must be after start date!");
-            }
+            if (!salePrice || Number(salePrice) <= 0) return toast.error("Valid Sale Price is required!");
+            if (Number(salePrice) >= Number(price)) return toast.error("Sale Price must be less than Regular Price!");
+            if (!saleStartDate || !saleEndDate) return toast.error("Sale dates are required!");
+            if (new Date(saleEndDate) <= new Date(saleStartDate)) return toast.error("Sale end must be after start!");
         }
-        if (!stock || Number(stock) < 0) {
-            return toast.error("Valid stock quantity is required!");
+
+        // Variant Validations
+        if (hasVariants) {
+            if (variants.length === 0) return toast.error("Add at least one variant!");
+            for (let i = 0; i < variants.length; i++) {
+                const v = variants[i];
+                if (!v.color.trim()) return toast.error(`Variant ${i + 1}: Color is required!`);
+                if (v.existingImages.length === 0 && v.compressedImages.length === 0) return toast.error(`Variant ${i + 1} (${v.color}): At least one image required!`);
+                if (v.sizes.length === 0) return toast.error(`Variant ${i + 1} (${v.color}): At least one size required!`);
+                for (let j = 0; j < v.sizes.length; j++) {
+                    if (!v.sizes[j].size.trim()) return toast.error(`Variant ${i + 1} (${v.color}): Size name is required!`);
+                }
+            }
+        } else {
+            if (!stock || Number(stock) < 0) return toast.error("Valid stock is required!");
         }
 
         setLoading(true);
@@ -333,53 +446,64 @@ const EditProduct = () => {
         try {
             const formData = new FormData();
 
-            // Basic product info
             formData.append("id", id);
             formData.append("name", name.trim());
             formData.append("description", description.trim());
             formData.append("originalPrice", Number(originalPrice));
             formData.append("price", Number(price));
-            formData.append("stock", Number(stock));
-            // formData.append("category", category); // Removed
             formData.append("subCategory", subCategory);
             formData.append("onSale", onSale.toString());
             formData.append("bestseller", bestseller.toString());
+            formData.append("hasVariants", hasVariants.toString());
 
-            // Append new images with field name 'image'
-            images.forEach((image) => {
-                formData.append("image", image); // Same field name for all images
-            });
-
-            // Send existing images that user wants to KEEP (removed ones won't be sent)
-            formData.append("existingImages", JSON.stringify(existingImages));
-
-            // Sale Logic
             if (onSale) {
                 formData.append("salePrice", Number(salePrice));
                 formData.append("saleStartDate", saleStartDate);
                 formData.append("saleEndDate", saleEndDate);
             }
 
-            // For debugging - show total size
-            let totalSize = 0;
-            for (let pair of formData.entries()) {
-                if (pair[0] === 'image' && pair[1] instanceof File) {
-                    totalSize += pair[1].size;
-                }
+            if (hasVariants) {
+                // Send variant metadata as JSON (including existing images per variant)
+                const variantsMeta = variants.map(v => ({
+                    color: v.color,
+                    existingImages: v.existingImages,
+                    sizes: v.sizes.map(s => ({
+                        size: s.size,
+                        stock: Number(s.stock) || 0,
+                        priceAdjustment: Number(s.priceAdjustment) || 0
+                    }))
+                }));
+                formData.append("variants", JSON.stringify(variantsMeta));
+                formData.append("stock", 0);
+
+                // Send existing variant images info so backend knows what to keep
+                const existingVariantsData = variants.map(v => ({
+                    images: v.existingImages
+                }));
+                formData.append("existingVariants", JSON.stringify(existingVariantsData));
+
+                // Append new variant images with field name `variant_{index}`
+                variants.forEach((variant, index) => {
+                    variant.compressedImages.forEach(img => {
+                        formData.append(`variant_${index}`, img);
+                    });
+                });
+
+                // Don't send legacy images for variant products
+                formData.append("existingImages", JSON.stringify([]));
+            } else {
+                formData.append("stock", Number(stock));
+                images.forEach((image) => {
+                    formData.append("image", image);
+                });
+                formData.append("existingImages", JSON.stringify(existingImages));
             }
-            console.log('Total upload size:', (totalSize / 1024 / 1024).toFixed(2), 'MB');
-            console.log('Existing images count:', existingImages.length);
-            console.log('New images count:', images.length);
 
             const backendUrl = import.meta.env.VITE_BACKEND_URL;
             const response = await axios.post(`${backendUrl}/api/products/update`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                timeout: 60000 // 60 seconds timeout
+                headers: { 'Content-Type': 'multipart/form-data' },
+                timeout: 120000
             });
-
-            console.log('Response:', response.data);
 
             if (response.data.success) {
                 toast.success(response.data.message || "Product updated successfully!");
@@ -389,17 +513,12 @@ const EditProduct = () => {
             }
         } catch (error) {
             console.error('Update error:', error);
-
             if (error.code === 'ECONNABORTED') {
-                toast.error("Upload timeout! Try uploading fewer or smaller images.");
-            } else if (error.response) {
-                if (error.response.data && error.response.data.message) {
-                    toast.error(`Error: ${error.response.data.message}`);
-                } else {
-                    toast.error(`Server error ${error.response.status}`);
-                }
+                toast.error("Upload timeout! Try fewer or smaller images.");
+            } else if (error.response?.data?.message) {
+                toast.error(`Error: ${error.response.data.message}`);
             } else if (error.request) {
-                toast.error("No response from server. Check if backend is running.");
+                toast.error("No response from server.");
             } else {
                 toast.error(`Error: ${error.message}`);
             }
@@ -1520,6 +1639,188 @@ const EditProduct = () => {
                             </div>
                             <Tag size={20} color={bestseller ? '#3b82f6' : '#94a3b8'} />
                         </div>
+                    </div>
+
+                    {/* ===== VARIANT SYSTEM ===== */}
+                    <div style={{
+                        padding: '28px',
+                        borderRadius: '20px',
+                        border: `2px solid ${hasVariants ? '#8b5cf6' : '#e2e8f0'}`,
+                        transition: 'all 0.5s ease',
+                        background: hasVariants ? 'linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)' : 'white',
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: hasVariants ? '1.5rem' : 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <Tag size={20} color={hasVariants ? '#7c3aed' : '#94a3b8'} />
+                                <span style={{ fontWeight: '700', fontSize: '1rem', color: hasVariants ? '#5b21b6' : '#334155' }}>
+                                    Product Variants (Color + Size)
+                                </span>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => { setHasVariants(!hasVariants); if (!hasVariants && variants.length === 0) addVariant(); }}
+                                style={{
+                                    padding: '0.5rem 1.25rem', borderRadius: '20px', border: 'none',
+                                    cursor: 'pointer', fontWeight: '700', fontSize: '0.875rem',
+                                    background: hasVariants ? '#7c3aed' : '#e2e8f0',
+                                    color: hasVariants ? 'white' : '#64748b',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                {hasVariants ? 'Enabled ✓' : 'Enable'}
+                            </button>
+                        </div>
+
+                        {hasVariants && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                {variants.map((variant, vIdx) => (
+                                    <div key={vIdx} style={{
+                                        background: 'white', borderRadius: '16px',
+                                        border: '1px solid #e2e8f0', padding: '1.5rem', position: 'relative'
+                                    }}>
+                                        {/* Variant Header */}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                            <span style={{ fontWeight: '700', fontSize: '0.875rem', color: '#7c3aed' }}>
+                                                Variant #{vIdx + 1}
+                                            </span>
+                                            {variants.length > 1 && (
+                                                <button type="button" onClick={() => removeVariant(vIdx)}
+                                                    style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#ef4444', padding: '6px 12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <Trash2 size={12} /> Remove
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Color Name */}
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#64748b', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                Color Name *
+                                            </label>
+                                            <input type="text" value={variant.color}
+                                                onChange={(e) => updateVariantColor(vIdx, e.target.value)}
+                                                placeholder="e.g., Gold, Silver, Rose Gold"
+                                                style={{ width: '100%', boxSizing: 'border-box', padding: '0.75rem 1rem', borderRadius: '12px', border: '2px solid #e2e8f0', outline: 'none', fontSize: '0.95rem', transition: 'border-color 0.2s' }}
+                                                onFocus={(e) => e.target.style.borderColor = '#8b5cf6'}
+                                                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                                            />
+                                        </div>
+
+                                        {/* Variant Images */}
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#64748b', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                Images for "{variant.color || 'this color'}" *
+                                            </label>
+
+                                            {/* Existing variant images */}
+                                            {variant.existingImages.length > 0 && (
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                                                    {variant.existingImages.map((img, imgIdx) => (
+                                                        <div key={`existing-${imgIdx}`} style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', aspectRatio: '1/1', border: '1px solid #e2e8f0' }}>
+                                                            <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            <button type="button" onClick={() => removeVariantExistingImage(vIdx, imgIdx)}
+                                                                style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(239,68,68,0.9)', color: 'white', border: 'none', width: '20px', height: '20px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <X size={12} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Upload new variant images */}
+                                            <label style={{
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                gap: '0.5rem', padding: '1rem', borderRadius: '12px',
+                                                border: '2px dashed #c4b5fd', background: '#faf5ff',
+                                                cursor: 'pointer', fontSize: '0.875rem', color: '#7c3aed', fontWeight: '600'
+                                            }}>
+                                                <UploadCloud size={18} />
+                                                Upload Images
+                                                <input type="file" accept="image/*" multiple style={{ display: 'none' }}
+                                                    onChange={(e) => handleVariantImageUpload(vIdx, e)} />
+                                            </label>
+
+                                            {/* New variant image previews */}
+                                            {variant.newImages.length > 0 && (
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                                    {variant.newImages.map((img, imgIdx) => (
+                                                        <div key={`new-${imgIdx}`} style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', aspectRatio: '1/1', border: '1px solid #e2e8f0' }}>
+                                                            <img src={URL.createObjectURL(img)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            <button type="button" onClick={() => removeVariantNewImage(vIdx, imgIdx)}
+                                                                style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(239,68,68,0.9)', color: 'white', border: 'none', width: '20px', height: '20px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <X size={12} />
+                                                            </button>
+                                                            <div style={{ position: 'absolute', top: '4px', left: '4px', background: 'rgba(34,197,94,0.9)', color: 'white', fontSize: '8px', fontWeight: '700', padding: '2px 6px', borderRadius: '6px' }}>NEW</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Sizes for this variant */}
+                                        <div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                    Sizes & Stock *
+                                                </label>
+                                                <button type="button" onClick={() => addSizeToVariant(vIdx)}
+                                                    style={{ background: '#8b5cf6', color: 'white', border: 'none', padding: '4px 12px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <Plus size={12} /> Add Size
+                                                </button>
+                                            </div>
+                                            {variant.sizes.map((sizeObj, sIdx) => (
+                                                <div key={sIdx} style={{
+                                                    display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto',
+                                                    gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'end'
+                                                }}>
+                                                    <div>
+                                                        <label style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: '600' }}>Size</label>
+                                                        <input type="text" value={sizeObj.size}
+                                                            onChange={(e) => updateVariantSize(vIdx, sIdx, 'size', e.target.value)}
+                                                            placeholder="e.g., S, M, L"
+                                                            style={{ width: '100%', boxSizing: 'border-box', padding: '0.6rem', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '0.875rem' }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: '600' }}>Stock</label>
+                                                        <input type="number" value={sizeObj.stock}
+                                                            onChange={(e) => updateVariantSize(vIdx, sIdx, 'stock', e.target.value)}
+                                                            min="0" step="1"
+                                                            style={{ width: '100%', boxSizing: 'border-box', padding: '0.6rem', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '0.875rem' }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: '600' }}>Price Adjust (₹)</label>
+                                                        <input type="number" value={sizeObj.priceAdjustment}
+                                                            onChange={(e) => updateVariantSize(vIdx, sIdx, 'priceAdjustment', e.target.value)}
+                                                            step="1"
+                                                            style={{ width: '100%', boxSizing: 'border-box', padding: '0.6rem', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '0.875rem' }}
+                                                        />
+                                                    </div>
+                                                    {variant.sizes.length > 1 && (
+                                                        <button type="button" onClick={() => removeSizeFromVariant(vIdx, sIdx)}
+                                                            style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#ef4444', padding: '0.6rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {/* Add Another Variant Button */}
+                                <button type="button" onClick={addVariant}
+                                    style={{
+                                        width: '100%', padding: '1rem', borderRadius: '12px',
+                                        border: '2px dashed #c4b5fd', background: 'transparent',
+                                        color: '#7c3aed', fontWeight: '700', fontSize: '0.875rem',
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center',
+                                        justifyContent: 'center', gap: '0.5rem'
+                                    }}>
+                                    <Plus size={18} /> Add Another Color Variant
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Submit Button */}

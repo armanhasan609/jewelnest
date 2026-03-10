@@ -174,7 +174,13 @@ const OrderDetails = () => {
             <tbody>
               ${order?.items.map(item => `
                 <tr>
-                  <td>${item.name}</td>
+                  <td>
+                    <div style="font-weight: bold;">${item.name}</div>
+                    ${item.selectedColor ? `<div style="color: #666; font-size: 12px;">Color: ${item.selectedColor}</div>` : ''}
+                    ${item.selectedSize ? `<div style="color: #666; font-size: 12px;">Size: ${item.selectedSize}</div>` : ''}
+                    ${(!item.selectedColor && item.color) ? `<div style="color: #666; font-size: 12px;">Color: ${item.color}</div>` : ''}
+                    ${(!item.selectedSize && item.size) ? `<div style="color: #666; font-size: 12px;">Size: ${item.size}</div>` : ''}
+                  </td>
                   <td>₹${item.price}</td>
                   <td>${item.quantity}</td>
                   <td>₹${item.price * item.quantity}</td>
@@ -520,7 +526,24 @@ const OrderDetails = () => {
                                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                         <div>
                                                             <h4 style={{ fontWeight: '600', color: '#111827' }}>{item.name}</h4>
-                                                            <div style={{ fontSize: '14px', color: '#4b5563', marginTop: '4px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+
+                                                            {/* Variant Details */}
+                                                            {((item.selectedColor || item.color) || (item.selectedSize || item.size)) && (
+                                                                <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                                                                    {(item.selectedColor || item.color) && (
+                                                                        <span style={{ backgroundColor: '#f3f4f6', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', color: '#4b5563', border: '1px solid #e5e7eb' }}>
+                                                                            🎨 Color: {item.selectedColor || item.color}
+                                                                        </span>
+                                                                    )}
+                                                                    {(item.selectedSize || item.size) && (
+                                                                        <span style={{ backgroundColor: '#f3f4f6', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', color: '#4b5563', border: '1px solid #e5e7eb' }}>
+                                                                            📐 Size: {item.selectedSize || item.size}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            )}
+
+                                                            <div style={{ fontSize: '14px', color: '#4b5563', marginTop: '6px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                                                 {(item.sku || item.product?.sku) && (
                                                                     <span>SKU: {item.sku || item.product?.sku}</span>
                                                                 )}

@@ -17,6 +17,10 @@ const Product = () => {
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [isImageZoomed, setIsImageZoomed] = useState(false);
 
+    // --- VARIANT STATES ---
+    const [selectedColor, setSelectedColor] = useState(null);
+    const [selectedSize, setSelectedSize] = useState(null);
+
     // Reviews state
     const [reviews, setReviews] = useState([]);
     const [reviewLoading, setReviewLoading] = useState(false);
@@ -33,6 +37,8 @@ const Product = () => {
 
     useEffect(() => {
         fetchProductData();
+        setSelectedColor(null);
+        setSelectedSize(null);
     }, [productId, products]);
 
     useEffect(() => {
@@ -80,39 +86,51 @@ const Product = () => {
             return;
         }
 
-        if (isAddingToCart) return;
+        // Variant validation
+        if (productData.hasVariants && productData.variants?.length > 0) {
+            if (!selectedColor) {
+                toast.error("Please select a color");
+                return;
+            }
+            if (!selectedSize) {
+                toast.error("Please select a size");
+                return;
+            }
+        }
 
+        if (isAddingToCart) return;
         setIsAddingToCart(true);
 
         try {
-            // Add items to cart using context function
-            for (let i = 0; i < quantity; i++) {
-                addToCart(productData._id);
+            if (productData.hasVariants && selectedColor && selectedSize) {
+                // Find the selected variant
+                const variant = productData.variants.find(v => v.color === selectedColor);
+                const sizeEntry = variant?.sizes?.find(s => s.size === selectedSize);
+                const variantImage = variant?.images?.[0]?.url || variant?.images?.[0] || '';
+
+                for (let i = 0; i < quantity; i++) {
+                    addToCart(productData._id, {
+                        selectedColor,
+                        selectedSize,
+                        variantImage,
+                        variantSku: variant?.sku || '',
+                        priceAdjustment: sizeEntry?.priceAdjustment || 0
+                    });
+                }
+            } else {
+                // Non-variant product
+                for (let i = 0; i < quantity; i++) {
+                    addToCart(productData._id);
+                }
             }
 
-            // Show success message
-            // toast.success(`${quantity} ${quantity === 1 ? 'item' : 'items'} added to cart!`, {
-            //     position: "top-right",
-            //     autoClose: 2000,
-            //     hideProgressBar: false,
-            //     closeOnClick: true,
-            //     pauseOnHover: true,
-            //     draggable: true
-            // });
-
-            // Show alert
             setShowAlert('success');
             setTimeout(() => setShowAlert(null), 3000);
-
-            // Reset quantity after successful add
             setQuantity(1);
 
         } catch (error) {
             console.error('Error adding to cart:', error);
-            toast.error("Failed to add to cart", {
-                position: "top-right",
-                autoClose: 2000
-            });
+            toast.error("Failed to add to cart", { position: "top-right", autoClose: 2000 });
         } finally {
             setIsAddingToCart(false);
         }
@@ -126,11 +144,39 @@ const Product = () => {
         }
     };
 
-    const productImages = productData?.images?.length
-        ? productData.images.map((img) => img.url)
-        : productData?.image
-            ? (Array.isArray(productData.image) ? productData.image : [productData.image])
-            : [];
+    // --- VARIANT-AWARE IMAGE LOGIC ---
+    const getDisplayImages = () => {
+        if (productData?.hasVariants && productData?.variants?.length > 0 && selectedColor) {
+            const variant = productData.variants.find(v => v.color === selectedColor);
+            if (variant?.images?.length > 0) {
+                return variant.images.map(img => typeof img === 'object' ? img.url : img);
+            }
+        }
+        // Fallback to main product images
+        return productData?.images?.length
+            ? productData.images.map((img) => img.url)
+            : productData?.image
+                ? (Array.isArray(productData.image) ? productData.image : [productData.image])
+                : [];
+    };
+    const productImages = getDisplayImages();
+
+    // Get selected variant for price adjustment
+    const getSelectedVariant = () => {
+        if (!productData?.hasVariants || !selectedColor) return null;
+        return productData.variants.find(v => v.color === selectedColor);
+    };
+    const selectedVariant = getSelectedVariant();
+
+    const getSelectedSizeEntry = () => {
+        if (!selectedVariant || !selectedSize) return null;
+        return selectedVariant.sizes.find(s => s.size === selectedSize);
+    };
+    const selectedSizeEntry = getSelectedSizeEntry();
+
+    // Check if variant product needs both color and size
+    const isVariantProduct = productData?.hasVariants && productData?.variants?.length > 0;
+    const canAddToCart = isVariantProduct ? (selectedColor && selectedSize) : true;
 
     if (loading) {
         return (
@@ -489,9 +535,216 @@ const Product = () => {
                                 color: '#6b7280',
                                 lineHeight: '1.8'
                             }}>
-                                {productData.description || "This exquisitely crafted jewelry piece embodies timeless elegance and sophistication. Meticulously designed by our master artisans, it features premium materials and exceptional attention to detail, making it the perfect accessory for any occasion."}
+                                {productData.description || "This exquisitely crafted jewelry piece embodies timeless elegance and sophistication."}
                             </p>
                         </div>
+
+                        {/* --- COLOR SWATCHES --- */}
+                        {isVariantProduct && (
+                            <div style={{
+                                marginBottom: '32px',
+                                paddingBottom: '32px',
+                                borderBottom: '2px solid #f3f4f6'
+                            }}>
+                                <h3 style={{
+                                    fontSize: '18px',
+                                    fontWeight: '600',
+                                    color: '#374151',
+                                    marginBottom: '16px'
+                                }}>
+                                    Color {selectedColor && <span style={{ color: '#b8860b', fontWeight: '700' }}>— {selectedColor}</span>}
+                                </h3>
+                                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                                    {productData.variants.map((variant) => {
+                                        const isActive = selectedColor === variant.color;
+                                        // Get first image of this variant for the thumbnail
+                                        const firstImg = variant.images?.[0];
+                                        const swatchImage = firstImg ? (typeof firstImg === 'object' ? firstImg.url : firstImg) : null;
+
+                                        return (
+                                            <button
+                                                key={variant.color}
+                                                onClick={() => {
+                                                    setSelectedColor(variant.color);
+                                                    setSelectedSize(null);
+                                                    setSelectedImage(0);
+                                                }}
+                                                style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    gap: '8px',
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    padding: '4px'
+                                                }}
+                                            >
+                                                <div style={{
+                                                    width: '64px',
+                                                    height: '64px',
+                                                    borderRadius: '14px',
+                                                    overflow: 'hidden',
+                                                    border: isActive ? '3px solid #b8860b' : '2px solid #e5e7eb',
+                                                    boxShadow: isActive ? '0 0 0 3px rgba(184, 134, 11, 0.25), 0 4px 12px rgba(0,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.08)',
+                                                    transition: 'all 0.3s ease',
+                                                    transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                                                    position: 'relative',
+                                                    background: '#f3f4f6'
+                                                }}>
+                                                    {swatchImage ? (
+                                                        <img
+                                                            src={swatchImage}
+                                                            alt={variant.color}
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                objectFit: 'cover'
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <div style={{
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            background: '#d1d5db',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '10px',
+                                                            color: '#6b7280'
+                                                        }}>
+                                                            {variant.color?.[0]}
+                                                        </div>
+                                                    )}
+                                                    {/* Selected overlay with checkmark */}
+                                                    {isActive && (
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            top: 0,
+                                                            left: 0,
+                                                            right: 0,
+                                                            bottom: 0,
+                                                            background: 'rgba(184, 134, 11, 0.35)',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            borderRadius: '12px'
+                                                        }}>
+                                                            <div style={{
+                                                                width: '26px',
+                                                                height: '26px',
+                                                                borderRadius: '50%',
+                                                                background: '#b8860b',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+                                                            }}>
+                                                                <Check size={16} style={{ color: 'white' }} />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <span style={{
+                                                    fontSize: '12px',
+                                                    fontWeight: isActive ? '700' : '500',
+                                                    color: isActive ? '#b8860b' : '#6b7280',
+                                                    maxWidth: '70px',
+                                                    textAlign: 'center',
+                                                    lineHeight: '1.2'
+                                                }}>
+                                                    {variant.color}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* --- SIZE BUTTONS --- */}
+                        {isVariantProduct && selectedColor && (
+                            <div style={{
+                                marginBottom: '32px',
+                                paddingBottom: '32px',
+                                borderBottom: '2px solid #f3f4f6'
+                            }}>
+                                <h3 style={{
+                                    fontSize: '18px',
+                                    fontWeight: '600',
+                                    color: '#374151',
+                                    marginBottom: '16px'
+                                }}>
+                                    Size {selectedSize && <span style={{ color: '#b8860b', fontWeight: '700' }}>— {selectedSize}</span>}
+                                </h3>
+                                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                    {selectedVariant?.sizes?.map((sizeObj) => {
+                                        const isActive = selectedSize === sizeObj.size;
+                                        const isOutOfStock = sizeObj.stock <= 0;
+
+                                        return (
+                                            <button
+                                                key={sizeObj.size}
+                                                onClick={() => !isOutOfStock && setSelectedSize(sizeObj.size)}
+                                                disabled={isOutOfStock}
+                                                style={{
+                                                    padding: '10px 20px',
+                                                    borderRadius: '10px',
+                                                    border: isActive ? '2px solid #b8860b' : '2px solid #e5e7eb',
+                                                    background: isOutOfStock ? '#f3f4f6' : isActive ? 'linear-gradient(45deg, #fef3c7, #fde68a)' : 'white',
+                                                    color: isOutOfStock ? '#9ca3af' : isActive ? '#92400e' : '#374151',
+                                                    fontWeight: isActive ? '700' : '500',
+                                                    fontSize: '14px',
+                                                    cursor: isOutOfStock ? 'not-allowed' : 'pointer',
+                                                    transition: 'all 0.3s ease',
+                                                    textDecoration: isOutOfStock ? 'line-through' : 'none',
+                                                    opacity: isOutOfStock ? 0.5 : 1,
+                                                    position: 'relative',
+                                                    minWidth: '60px'
+                                                }}
+                                            >
+                                                {sizeObj.size}
+                                                {isOutOfStock && (
+                                                    <span style={{
+                                                        position: 'absolute',
+                                                        top: '-8px',
+                                                        right: '-8px',
+                                                        background: '#ef4444',
+                                                        color: 'white',
+                                                        fontSize: '8px',
+                                                        fontWeight: '700',
+                                                        padding: '2px 6px',
+                                                        borderRadius: '10px'
+                                                    }}>
+                                                        OUT
+                                                    </span>
+                                                )}
+                                                {sizeObj.priceAdjustment !== 0 && !isOutOfStock && (
+                                                    <span style={{
+                                                        display: 'block',
+                                                        fontSize: '10px',
+                                                        color: sizeObj.priceAdjustment > 0 ? '#ef4444' : '#10b981',
+                                                        marginTop: '2px'
+                                                    }}>
+                                                        {sizeObj.priceAdjustment > 0 ? '+' : ''}{currency}{sizeObj.priceAdjustment}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                {selectedSizeEntry && selectedSizeEntry.stock > 0 && selectedSizeEntry.stock <= 5 && (
+                                    <p style={{
+                                        marginTop: '8px',
+                                        fontSize: '13px',
+                                        color: '#ef4444',
+                                        fontWeight: '600'
+                                    }}>
+                                        ⚡ Only {selectedSizeEntry.stock} left in stock!
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         {/* Quantity Selector */}
                         <div style={{
@@ -608,17 +861,17 @@ const Product = () => {
                         }}>
                             <button
                                 onClick={handleAddToCart}
-                                disabled={isAddingToCart}
+                                disabled={isAddingToCart || (isVariantProduct && !canAddToCart)}
                                 style={{
                                     flex: 1,
-                                    background: 'linear-gradient(45deg, #b8860b, #fbbf24)',
-                                    color: 'white',
+                                    background: (!canAddToCart && isVariantProduct) ? '#e5e7eb' : 'linear-gradient(45deg, #b8860b, #fbbf24)',
+                                    color: (!canAddToCart && isVariantProduct) ? '#9ca3af' : 'white',
                                     padding: '20px',
                                     borderRadius: '12px',
                                     border: 'none',
                                     fontSize: '18px',
                                     fontWeight: '600',
-                                    cursor: isAddingToCart ? 'not-allowed' : 'pointer',
+                                    cursor: (isAddingToCart || (isVariantProduct && !canAddToCart)) ? 'not-allowed' : 'pointer',
                                     transition: 'all 0.3s ease',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -627,15 +880,15 @@ const Product = () => {
                                     opacity: isAddingToCart ? 0.6 : 1
                                 }}
                                 onMouseEnter={(e) => {
-                                    if (!isAddingToCart) {
-                                        e.target.style.transform = 'translateY(-3px)';
-                                        e.target.style.boxShadow = '0 15px 30px rgba(184, 134, 11, 0.3)';
+                                    if (!isAddingToCart && canAddToCart) {
+                                        e.currentTarget.style.transform = 'translateY(-3px)';
+                                        e.currentTarget.style.boxShadow = '0 15px 30px rgba(184, 134, 11, 0.3)';
                                     }
                                 }}
                                 onMouseLeave={(e) => {
-                                    if (!isAddingToCart) {
-                                        e.target.style.transform = 'translateY(0)';
-                                        e.target.style.boxShadow = 'none';
+                                    if (!isAddingToCart && canAddToCart) {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = 'none';
                                     }
                                 }}
                             >
@@ -651,10 +904,16 @@ const Product = () => {
                                         }} />
                                         Adding...
                                     </>
+                                ) : (isVariantProduct && !canAddToCart) ? (
+                                    <>
+                                        <ShoppingBag size={20} />
+                                        {!selectedColor ? 'Select a Color' : 'Select a Size'}
+                                    </>
                                 ) : (
                                     <>
                                         <ShoppingBag size={20} />
                                         Add to Cart {quantity > 1 && `(${quantity})`}
+                                        {selectedSizeEntry?.priceAdjustment ? ` — ${currency}${displayPrice + selectedSizeEntry.priceAdjustment}` : ''}
                                     </>
                                 )}
                             </button>

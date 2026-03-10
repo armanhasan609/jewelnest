@@ -207,7 +207,13 @@ const Orders = () => {
                          alt="${item.name}" 
                          style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
                 </td>
-                <td style="padding: 4px; border-bottom: 1px solid #ddd; font-size: 10px;">${item.name}</td>
+                <td style="padding: 4px; border-bottom: 1px solid #ddd; font-size: 10px;">
+                    <div style="font-weight: bold;">${item.name}</div>
+                    ${item.selectedColor ? `<div style="color: #666; font-size: 9px;">Color: ${item.selectedColor}</div>` : ''}
+                    ${item.selectedSize ? `<div style="color: #666; font-size: 9px;">Size: ${item.selectedSize}</div>` : ''}
+                    ${(!item.selectedColor && item.color) ? `<div style="color: #666; font-size: 9px;">Color: ${item.color}</div>` : ''}
+                    ${(!item.selectedSize && item.size) ? `<div style="color: #666; font-size: 9px;">Size: ${item.size}</div>` : ''}
+                </td>
                 <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: center; font-size: 10px;">${item.quantity}</td>
                 <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: right; font-size: 10px;">₹${item.price.toLocaleString('en-IN')}</td>
                 <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: right; font-size: 10px;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
@@ -732,13 +738,20 @@ const Orders = () => {
                                             <div style={{
                                                 fontSize: '12px',
                                                 color: '#6b7280',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '2px',
+                                                marginTop: '4px',
                                                 maxWidth: '320px'
                                             }}>
-                                                {order.items?.slice(0, 2).map(item => item.name).join(', ')}
-                                                {order.items?.length > 2 && '...'}
+                                                {order.items?.slice(0, 2).map((item, idx) => (
+                                                    <div key={idx} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        • {item.name}
+                                                        {(item.selectedColor || item.color) && ` - ${(item.selectedColor || item.color)}`}
+                                                        {(item.selectedSize || item.size) && ` (${(item.selectedSize || item.size)})`}
+                                                    </div>
+                                                ))}
+                                                {order.items?.length > 2 && <div style={{ fontStyle: 'italic' }}>...and {order.items.length - 2} more</div>}
                                             </div>
                                         </td>
                                         <td className="table-cell" style={{ whiteSpace: 'nowrap' }}>

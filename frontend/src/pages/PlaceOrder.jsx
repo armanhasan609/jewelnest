@@ -152,36 +152,70 @@ const PlaceOrder = () => {
         }
 
         const items = [];
-        for (const id in cartItems) {
-            const p = products.find((x) => x._id === id);
-            if (p && cartItems[id] > 0) {
-                // --- 🟢 IMAGE FIX START ---
-                let safeImage = '';
+        for (const key in cartItems) {
+            const entry = cartItems[key];
 
-                // Priority 1: Check 'images' array (Cloudinary standard)
-                if (Array.isArray(p.images) && p.images.length > 0) {
-                    safeImage = typeof p.images[0] === 'object' ? p.images[0].url : p.images[0];
-                }
-                // Priority 2: Check 'image' (Legacy or singular)
-                else if (p.image) {
-                    safeImage = Array.isArray(p.image) ? p.image[0] : p.image;
-                }
-                // --- 🟢 IMAGE FIX END ---
+            if (typeof entry === 'object' && entry.quantity > 0) {
+                // Variant item
+                const p = products.find((x) => x._id === entry.productId);
+                if (p) {
+                    let safeImage = entry.variantImage || '';
+                    if (!safeImage) {
+                        if (Array.isArray(p.images) && p.images.length > 0) {
+                            safeImage = typeof p.images[0] === 'object' ? p.images[0].url : p.images[0];
+                        } else if (p.image) {
+                            safeImage = Array.isArray(p.image) ? p.image[0] : p.image;
+                        }
+                    }
 
-                items.push({
-                    productId: p._id,
-                    name: p.name,
-                    price: Number(getProductCurrentPrice(p)),
-                    quantity: Number(cartItems[id]),
-                    image: safeImage || "https://placehold.co/150",
-                    images: [safeImage] || ["https://placehold.co/150"],
-                    sku: p.sku || 'N/A',
-                    category: p.category || 'General',
-                    size: p.size || '',
-                    color: p.color || '',
-                    material: p.material || '',
-                    weight: p.weight || ''
-                });
+                    const basePrice = Number(getProductCurrentPrice(p));
+                    const priceAdj = Number(entry.priceAdjustment) || 0;
+
+                    items.push({
+                        productId: p._id,
+                        name: p.name,
+                        price: basePrice + priceAdj,
+                        quantity: Number(entry.quantity),
+                        image: safeImage || "https://placehold.co/150",
+                        images: [safeImage] || ["https://placehold.co/150"],
+                        sku: entry.variantSku || p.sku || 'N/A',
+                        category: p.category || 'General',
+                        size: entry.selectedSize || '',
+                        color: entry.selectedColor || '',
+                        material: p.material || '',
+                        weight: p.weight || '',
+                        selectedColor: entry.selectedColor,
+                        selectedSize: entry.selectedSize,
+                        variantSku: entry.variantSku,
+                        variantImage: safeImage
+                    });
+                }
+            } else if (typeof entry === 'number' && entry > 0) {
+                // Non-variant item (legacy)
+                const p = products.find((x) => x._id === key);
+                if (p) {
+                    let safeImage = '';
+                    if (Array.isArray(p.images) && p.images.length > 0) {
+                        safeImage = typeof p.images[0] === 'object' ? p.images[0].url : p.images[0];
+                    } else if (p.image) {
+                        safeImage = Array.isArray(p.image) ? p.image[0] : p.image;
+                    }
+
+                    items.push({
+                        productId: p._id,
+                        name: p.name,
+                        price: Number(getProductCurrentPrice(p)),
+                        quantity: Number(entry),
+                        image: safeImage || "https://placehold.co/150",
+                        images: [safeImage] || ["https://placehold.co/150"],
+                        sku: p.sku || 'N/A',
+                        category: p.category || 'General',
+                        size: p.size || '',
+                        color: p.color || '',
+                        material: p.material || '',
+                        weight: p.weight || ''
+                    });
+                }
             }
         }
 

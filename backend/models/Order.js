@@ -55,7 +55,12 @@ const OrderSchema = new mongoose.Schema({
             size: String,
             color: String,
             material: String,
-            weight: String
+            weight: String,
+            // --- VARIANT DETAILS ---
+            selectedColor: String,
+            selectedSize: String,
+            variantSku: String,
+            variantImage: String
         }
     ],
     totalAmount: {

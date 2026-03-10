@@ -6,15 +6,15 @@ export const ShopContext = createContext();
 
 const ShopContextProvider = ({ children }) => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    // const backendUrl = ;
     const currency = "₹";
     const delivery_fee = 50;
     const FREE_SHIPPING_THRESHOLD = 499;
 
-    // ---------------- STATES ----------------y
+    // ---------------- STATES ----------------
     const [products, setProducts] = useState([]);
 
-    // FIX 1: Load Cart from LocalStorage so data isn't lost on refresh
+    // Cart now stores objects with variant info: { quantity, selectedColor, selectedSize, variantImage, variantSku }
+    // Key format: productId OR productId_color_size for variant items
     const [cartItems, setCartItems] = useState(() => {
         try {
             const savedCart = localStorage.getItem("cartItems");
@@ -65,12 +65,12 @@ const ShopContextProvider = ({ children }) => {
         getProductsData();
     }, [getProductsData]);
 
-    // FIX 2: Save Cart to LocalStorage whenever it changes
+    // Save Cart to LocalStorage whenever it changes
     useEffect(() => {
         localStorage.setItem("cartItems", JSON.stringify(cartItems));
     }, [cartItems]);
 
-    // ---------------- HELPER: GLOBAL IMAGE RESOLVER (Fixes Image Issues) ----------------
+    // ---------------- HELPER: GLOBAL IMAGE RESOLVER ----------------
     const resolveImage = (product) => {
         if (!product) return "";
 
@@ -88,24 +88,74 @@ const ShopContextProvider = ({ children }) => {
         return ""; // Or a placeholder URL
     };
 
-    // ---------------- CART ----------------
-    const addToCart = (productId) => {
-        setCartItems((prev) => ({
-            ...prev,
-            [productId]: (prev[productId] || 0) + 1,
-        }));
+    // ---------------- CART KEY GENERATOR ----------------
+    // For variant products: productId_color_size
+    // For non-variant products: productId
+    const getCartKey = (productId, selectedColor, selectedSize) => {
+        if (selectedColor && selectedSize) {
+            return `${productId}_${selectedColor}_${selectedSize}`;
+        }
+        return productId;
     };
 
-    const removeFromCart = (productId) => {
+    // ---------------- CART ----------------
+    const addToCart = (productId, variantInfo = null) => {
+        // variantInfo: { selectedColor, selectedSize, variantImage, variantSku, priceAdjustment }
+        if (variantInfo) {
+            const key = getCartKey(productId, variantInfo.selectedColor, variantInfo.selectedSize);
+            setCartItems((prev) => {
+                const existing = prev[key];
+                if (existing && typeof existing === 'object') {
+                    return {
+                        ...prev,
+                        [key]: { ...existing, quantity: existing.quantity + 1 }
+                    };
+                }
+                return {
+                    ...prev,
+                    [key]: {
+                        quantity: 1,
+                        productId,
+                        selectedColor: variantInfo.selectedColor,
+                        selectedSize: variantInfo.selectedSize,
+                        variantImage: variantInfo.variantImage || '',
+                        variantSku: variantInfo.variantSku || '',
+                        priceAdjustment: variantInfo.priceAdjustment || 0
+                    }
+                };
+            });
+        } else {
+            // Non-variant product (backward compatible)
+            setCartItems((prev) => {
+                const existing = prev[productId];
+                if (typeof existing === 'object') {
+                    return { ...prev, [productId]: { ...existing, quantity: existing.quantity + 1 } };
+                }
+                return { ...prev, [productId]: (existing || 0) + 1 };
+            });
+        }
+    };
+
+    const removeFromCart = (cartKey) => {
         setCartItems((prev) => {
             const copy = { ...prev };
-            delete copy[productId];
+            delete copy[cartKey];
             return copy;
         });
     };
 
-    const getCartCount = () =>
-        Object.values(cartItems).reduce((a, b) => a + b, 0);
+    const getCartCount = () => {
+        let count = 0;
+        for (const key in cartItems) {
+            const item = cartItems[key];
+            if (typeof item === 'object') {
+                count += item.quantity || 0;
+            } else {
+                count += item;
+            }
+        }
+        return count;
+    };
 
     const getProductPrice = (product) => product?.price || 0;
 
@@ -132,10 +182,22 @@ const ShopContextProvider = ({ children }) => {
 
     const getCartAmount = () => {
         let total = 0;
-        for (let id in cartItems) {
-            const product = products.find((p) => p._id === id);
-            if (product) {
-                total += getProductCurrentPrice(product) * cartItems[id];
+        for (let key in cartItems) {
+            const cartEntry = cartItems[key];
+            if (typeof cartEntry === 'object') {
+                // Variant item
+                const product = products.find((p) => p._id === cartEntry.productId);
+                if (product) {
+                    const basePrice = getProductCurrentPrice(product);
+                    const adjustment = cartEntry.priceAdjustment || 0;
+                    total += (basePrice + adjustment) * cartEntry.quantity;
+                }
+            } else {
+                // Non-variant item (legacy)
+                const product = products.find((p) => p._id === key);
+                if (product) {
+                    total += getProductCurrentPrice(product) * cartEntry;
+                }
             }
         }
         return total;
@@ -146,40 +208,74 @@ const ShopContextProvider = ({ children }) => {
         return cartTotal >= FREE_SHIPPING_THRESHOLD ? 0 : delivery_fee;
     };
 
-    const updateCartItemQuantity = (productId, quantity) => {
+    const updateCartItemQuantity = (cartKey, quantity) => {
         setCartItems((prev) => {
             const updated = { ...prev };
             if (quantity <= 0) {
-                delete updated[productId];
+                delete updated[cartKey];
             } else {
-                updated[productId] = quantity;
+                const existing = updated[cartKey];
+                if (typeof existing === 'object') {
+                    updated[cartKey] = { ...existing, quantity };
+                } else {
+                    updated[cartKey] = quantity;
+                }
             }
             return updated;
         });
     };
 
-    // ---------------- NEW: PREPARE DATA FOR BACKEND ----------------
-    // This creates the exact payload your backend 'createOrder' expects
-    // ensuring images are strings (URLs) and not objects/undefined.
+    // ---------------- PREPARE DATA FOR BACKEND ----------------
     const getCartPayload = () => {
         const payload = [];
-        for (const id in cartItems) {
-            const product = products.find(p => p._id === id);
-            if (product && cartItems[id] > 0) {
-                payload.push({
-                    productId: id,
-                    name: product.name,
-                    price: getProductCurrentPrice(product),
-                    quantity: cartItems[id],
-                    image: resolveImage(product), // <--- THIS FIXES THE IMAGE ISSUE
-                    images: product.images || [],
-                    sku: product.sku || '',
-                    category: product.category || '',
-                    size: product.size || '',
-                    color: product.color || '',
-                    material: product.material || '',
-                    weight: product.weight || ''
-                });
+        for (const key in cartItems) {
+            const cartEntry = cartItems[key];
+
+            if (typeof cartEntry === 'object') {
+                // Variant item
+                const product = products.find(p => p._id === cartEntry.productId);
+                if (product && cartEntry.quantity > 0) {
+                    const basePrice = getProductCurrentPrice(product);
+                    const adjustment = cartEntry.priceAdjustment || 0;
+                    payload.push({
+                        productId: cartEntry.productId,
+                        name: product.name,
+                        price: basePrice + adjustment,
+                        quantity: cartEntry.quantity,
+                        image: cartEntry.variantImage || resolveImage(product),
+                        images: product.images || [],
+                        sku: product.sku || '',
+                        category: product.category || '',
+                        size: cartEntry.selectedSize || '',
+                        color: cartEntry.selectedColor || '',
+                        material: product.material || '',
+                        weight: product.weight || '',
+                        // Variant-specific fields
+                        selectedColor: cartEntry.selectedColor,
+                        selectedSize: cartEntry.selectedSize,
+                        variantSku: cartEntry.variantSku,
+                        variantImage: cartEntry.variantImage || resolveImage(product)
+                    });
+                }
+            } else {
+                // Non-variant item (legacy)
+                const product = products.find(p => p._id === key);
+                if (product && cartEntry > 0) {
+                    payload.push({
+                        productId: key,
+                        name: product.name,
+                        price: getProductCurrentPrice(product),
+                        quantity: cartEntry,
+                        image: resolveImage(product),
+                        images: product.images || [],
+                        sku: product.sku || '',
+                        category: product.category || '',
+                        size: product.size || '',
+                        color: product.color || '',
+                        material: product.material || '',
+                        weight: product.weight || ''
+                    });
+                }
             }
         }
         return payload;
@@ -236,8 +332,9 @@ const ShopContextProvider = ({ children }) => {
         getProductPrice,
         getProductCurrentPrice,
         getShippingFee,
-        resolveImage,  // <--- Exposing this globally
-        getCartPayload, // <--- Exposing this for PlaceOrder page
+        resolveImage,
+        getCartPayload,
+        getCartKey,
         currency,
         delivery_fee,
         FREE_SHIPPING_THRESHOLD,
@@ -258,7 +355,7 @@ const ShopContextProvider = ({ children }) => {
         setSearch,
         showSearch,
         setShowSearch,
-        subCategories, // Add this
+        subCategories,
     };
 
     return (
