@@ -34,6 +34,8 @@ import AdminOrders from "./admin/pages/Orders"; // Admin side orders
 import OrderDetails from "./admin/pages/OrderDetails"; // Import OrderDetails
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Inquiries from "./admin/pages/Inquiries";
+import AdminChat from "./admin/pages/AdminChat";
+import ChatWidget from "./components/ChatWidget";
 
 function App() {
   const location = useLocation();
@@ -84,6 +86,7 @@ function App() {
             <Route path='/admin/users' element={<ProtectedRoute roleRequired="admin"><Users /></ProtectedRoute>} />
             <Route path='/admin/edit/:id' element={<ProtectedRoute roleRequired="admin"><EditProduct /></ProtectedRoute>} />
             <Route path='/admin/inquiries' element={<ProtectedRoute roleRequired="admin"><Inquiries /></ProtectedRoute>} />
+            <Route path='/admin/chat' element={<ProtectedRoute roleRequired="admin"><AdminChat /></ProtectedRoute>} />
 
             {/* 404 Page */}
             <Route path="*" element={<div className="text-center py-20 text-2xl font-bold">404 - Page Not Found</div>} />
@@ -92,6 +95,7 @@ function App() {
       </div>
 
       {!isAdminAuthenticated && <Footer />}
+      {!isAdminAuthenticated && token && role !== 'admin' && <ChatWidget />}
     </div>
   );
 }

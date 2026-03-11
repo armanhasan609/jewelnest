@@ -145,6 +145,35 @@ const Inquiries = ({ token }) => {
         setShowDeleteConfirm(true);
     };
 
+    const handleSelectInquiry = async (inquiry) => {
+        setSelectedInquiry(inquiry);
+        
+        // If the inquiry is unread, mark it as read automatically when opened
+        if (inquiry.status === 'unread') {
+            try {
+                const activeToken = token || localStorage.getItem('token');
+                const response = await axios.put(
+                    `${backendUrl}/api/contact/${inquiry._id}`,
+                    { status: 'read' },
+                    { headers: { token: activeToken } }
+                );
+
+                if (response.data.success) {
+                    // Update the local state to show it as read
+                    setMessages(prev => prev.map(msg => 
+                        msg._id === inquiry._id ? { ...msg, status: 'read' } : msg
+                    ));
+                    // Update the selected inquiry object if it hasn't changed
+                    setSelectedInquiry(prev => 
+                        prev && prev._id === inquiry._id ? { ...prev, status: 'read' } : prev
+                    );
+                }
+            } catch (error) {
+                console.error("Failed to mark inquiry as read:", error);
+            }
+        }
+    };
+
     const getStatusColor = (status) => {
         switch (status) {
             case 'read': return '#10b981';
@@ -312,7 +341,8 @@ const Inquiries = ({ token }) => {
                 }
 
                 .inquiries-list {
-                    flex: 2;
+                    flex: 1;
+                    min-width: 320px;
                     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
                     backdrop-filter: blur(10px);
                     border-radius: 20px;
@@ -323,7 +353,7 @@ const Inquiries = ({ token }) => {
                 }
 
                 .details-panel {
-                    flex: 1;
+                    flex: 2;
                     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
                     backdrop-filter: blur(10px);
                     border-radius: 20px;
@@ -663,7 +693,7 @@ const Inquiries = ({ token }) => {
                                             alignItems: 'flex-start',
                                             marginBottom: '12px'
                                         }}>
-                                            <div onClick={() => setSelectedInquiry(item)} style={{ cursor: 'pointer', flex: 1 }}>
+                                            <div onClick={() => handleSelectInquiry(item)} style={{ cursor: 'pointer', flex: 1 }}>
                                                 <div style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -752,7 +782,7 @@ const Inquiries = ({ token }) => {
                                             </div>
                                         </div>
 
-                                        <div onClick={() => setSelectedInquiry(item)} style={{ cursor: 'pointer' }}>
+                                        <div onClick={() => handleSelectInquiry(item)} style={{ cursor: 'pointer' }}>
                                             <div style={{
                                                 fontSize: '14px',
                                                 color: '#475569',
@@ -1066,7 +1096,7 @@ const Inquiries = ({ token }) => {
                                         fontSize: '15px',
                                         color: '#475569',
                                         lineHeight: '1.6',
-                                        height: '300px',
+                                        minHeight: '200px',
                                         overflowY: 'auto',
                                         whiteSpace: 'pre-wrap'
                                     }}>

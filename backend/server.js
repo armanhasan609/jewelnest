@@ -16,6 +16,7 @@ const contactRouter = require('./routes/contactRoute');
 const reviewsRouter = require('./routes/reviewsRoutes');
 const subCategoryRouter = require('./routes/subCategoryRoutes');
 const couponRouter = require('./routes/couponRoutes');
+const chatRouter = require('./routes/chatRoutes');
 
 // 1. Database Connect
 connectDB();
@@ -63,6 +64,7 @@ app.use('/api/contact', contactRouter);
 app.use('/api/reviews', reviewsRouter);
 app.use('/api/subcategories', subCategoryRouter);
 app.use('/api/coupons', couponRouter);
+app.use('/api/chat', chatRouter);
 
 // 5. Health Check
 app.get('/api/health', (req, res) => {
@@ -113,6 +115,20 @@ io.on('connection', (socket) => {
             io.to(userId).emit('receive_message', message);
         } catch (error) {
             console.error('Socket error:', error);
+        }
+    });
+
+    socket.on('clear_chat', async (userId) => {
+        if (!userId) return;
+        try {
+            // Completely delete from DB
+            await chatModel.findOneAndDelete({ userId });
+            
+            // Broadcast to the room with userId payload so clients know which one was cleared
+            // We also emit to ALL connected clients so the admin sees it everywhere
+            io.emit('chat_cleared', userId);
+        } catch (error) {
+            console.error('Socket clear chat error:', error);
         }
     });
 

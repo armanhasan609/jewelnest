@@ -1,20 +1,37 @@
-const chatModel = require('../models/chatModel');
+const mongoose = require('mongoose');
 
-const sendMessage = async (req, res) => {
-    try {
-        const { userId, text, sender } = req.body; // sender: 'user' or 'admin'
-
-        const chat = await chatModel.findOneAndUpdate(
-            { userId: userId }, // Is user ka chat dhoondo
-            {
-                $push: { messages: { sender, text } }, // Array mein naya message daalo
-                $set: { lastMessageAt: Date.now() }     // Time update karo
-            },
-            { upsert: true, new: true } // Agar chat nahi hai toh naya banao
-        );
-
-        res.json({ success: true, chat });
-    } catch (error) {
-        res.json({ success: false, message: error.message });
+const messageSchema = new mongoose.Schema({
+    sender: {
+        type: String,
+        enum: ['user', 'admin'],
+        required: true
+    },
+    text: {
+        type: String,
+        required: true
+    },
+    timestamp: {
+        type: Date,
+        default: Date.now
     }
-};
+});
+
+const chatSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true,
+        unique: true
+    },
+    messages: [messageSchema],
+    lastMessageAt: {
+        type: Date,
+        default: Date.now
+    }
+}, {
+    timestamps: true
+});
+
+const chatModel = mongoose.models.chat || mongoose.model('chat', chatSchema);
+
+module.exports = chatModel;
