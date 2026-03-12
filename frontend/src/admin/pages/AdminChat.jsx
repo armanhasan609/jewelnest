@@ -29,7 +29,7 @@ const AdminChat = () => {
     // Connect socket
     useEffect(() => {
         if (!token) return;
-        const newSocket = io(backendUrl, { transports: ['websocket', 'polling'] });
+        const newSocket = io(backendUrl, { transports: ['websocket'], secure: true });
 
         newSocket.on('connect', () => setIsConnected(true));
         newSocket.on('disconnect', () => setIsConnected(false));
@@ -54,19 +54,19 @@ const AdminChat = () => {
         });
 
         newSocket.on('chat_cleared', (clearedUserId) => {
-             // If we receive this, clear the UI messages
-             setMessages([]);
-             
-             // Safely update the chats list using functional state update
-             setChats(prev => prev.filter(c => c.userId !== clearedUserId));
-             
-             // Safely clear the selected chat if it was the one cleared
-             setSelectedChat(current => {
-                 if (current && current.userId === clearedUserId) {
-                     return null;
-                 }
-                 return current;
-             });
+            // If we receive this, clear the UI messages
+            setMessages([]);
+
+            // Safely update the chats list using functional state update
+            setChats(prev => prev.filter(c => c.userId !== clearedUserId));
+
+            // Safely clear the selected chat if it was the one cleared
+            setSelectedChat(current => {
+                if (current && current.userId === clearedUserId) {
+                    return null;
+                }
+                return current;
+            });
         });
 
         setSocket(newSocket);

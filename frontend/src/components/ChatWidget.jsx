@@ -21,7 +21,8 @@ const ChatWidget = () => {
         if (!token || !userId) return;
 
         const newSocket = io(backendUrl, {
-            transports: ['websocket', 'polling']
+            transports: ['websocket'],
+            secure: true
         });
 
         newSocket.on('connect', () => {
@@ -274,17 +275,17 @@ const ChatWidget = () => {
                                     justifyContent: 'center',
                                     transition: 'all 0.2s ease'
                                 }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
-                                e.currentTarget.style.color = '#fff';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                                e.currentTarget.style.color = '#94a3b8';
-                            }}
-                        >
-                            <X size={18} />
-                        </button>
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                                    e.currentTarget.style.color = '#fff';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                                    e.currentTarget.style.color = '#94a3b8';
+                                }}
+                            >
+                                <X size={18} />
+                            </button>
                         </div>
                     </div>
 
@@ -512,7 +513,7 @@ const ChatWidget = () => {
                     to { opacity: 1; transform: translateY(0); }
                 }
             `}</style>
-            
+
             {/* Mobile Responsive Styles */}
             <style>{`
                 @media (max-width: 640px) {

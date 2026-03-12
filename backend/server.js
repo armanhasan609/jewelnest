@@ -77,8 +77,9 @@ const server = http.createServer(app);
 // 6. Socket.IO Setup
 const io = new Server(server, {
     cors: {
-        origin: "*", // Testing ke liye easy rakha hai
-        methods: ["GET", "POST"]
+        origin: ["https://jewelnest.co", "http://localhost:5173"],
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
@@ -123,7 +124,7 @@ io.on('connection', (socket) => {
         try {
             // Completely delete from DB
             await chatModel.findOneAndDelete({ userId });
-            
+
             // Broadcast to the room with userId payload so clients know which one was cleared
             // We also emit to ALL connected clients so the admin sees it everywhere
             io.emit('chat_cleared', userId);
